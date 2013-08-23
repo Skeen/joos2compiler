@@ -1,0 +1,15 @@
+env = Environment()
+env.Append(CPPFLAGS=['--std=c++11'])
+    
+include = [
+    '#/src',
+    '#/include',
+    '.'
+]
+
+env['CPPPATH'] = include
+
+sources = Glob("*.cpp")
+objects = env.Object(source = sources)
+
+env.Program('Parser', objects)
