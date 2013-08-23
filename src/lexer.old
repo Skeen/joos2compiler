@@ -1,0 +1,41 @@
+#include "Lexer.hpp"
+
+/*
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int main(int argc, char* argv[])
+{
+    // read input from the given file
+    std::string str (read_from_file(1 == argc ? "parser.input" : argv[1]));
+
+    // create the token definition instance needed to invoke the lexical analyzer
+    java_tokens<lex::lexertl::lexer<>> java_tokens_functor;
+    // tokenize the given string, the bound functor gets invoked for each of 
+    // the matched tokens
+    char const* first = str.c_str();
+    char const* last = &first[str.size()];
+
+    std::vector<std::pair<unsigned, std::string>> vec;
+    bool r = lex::tokenize(first, last, java_tokens_functor, 
+        boost::bind(token_collector(), _1, boost::ref(vec)));
+    vec.push_back(std::make_pair(END_OF_FILE, "END_OF_FILE"));
+
+    // print results
+    if (r) {
+        std::cout << "tokens are:" << std::endl;
+        for(std::pair<unsigned, std::string> value : vec)
+        {
+            std::cout << find_enum_type(std::get<0>(value)) << ":\t" << std::get<1>(value) << std::endl;
+        }
+    }
+    else {
+        std::string rest(first, last);
+        std::cout << "Lexical analysis failed\n" << "stopped at: \"" 
+                  << rest << "\"\n";
+    }
+
+    return 0;
+}
+*/
