@@ -1,0 +1,6 @@
+#ifndef _COMPILER_SPECIFIC_HPP
+#define _COMPILER_SPECIFIC_HPP
+
+#define NO_RETURN noreturn
+
+#endif // _COMPILER_SPECIFIC_HPP

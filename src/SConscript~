@@ -10,7 +10,7 @@ include = [
     '.'
 ]
 
-env['CPPPATH'] = include
+tmpEnv['CPPPATH'] = include
 
 object_list = env.Object(source = sources)
 

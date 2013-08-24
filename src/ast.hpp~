@@ -2,9 +2,8 @@
 #define _COMPILER_AST_HPP
 
 #include "Lexer_Position.hpp"
+#include "Maybe/Maybe.hpp"
 #include "Utility.hpp"
-
-#include <Maybe/Maybe.hpp>
 
 #include <string>
 #include <list>
