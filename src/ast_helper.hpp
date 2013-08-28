@@ -51,19 +51,19 @@ namespace Ast
         }
 
     /* typeexp -> bool */
-    const auto is_base_type   = generic_type_test<const type_expression_base>;
-    const auto is_array       = generic_type_test<const type_expression_tarray>;
-    const auto is_named_type  = generic_type_test<const type_expression_named>;
+    constexpr auto is_base_type   = generic_type_test<const type_expression_base>;
+    constexpr auto is_array       = generic_type_test<const type_expression_tarray>;
+    constexpr auto is_named_type  = generic_type_test<const type_expression_named>;
 
-    const auto is_void    = generic_type_test_base<const base_type_void>;
-    const auto is_byte    = generic_type_test_base<const base_type_byte>;
-    const auto is_short   = generic_type_test_base<const base_type_short>;
-    const auto is_int     = generic_type_test_base<const base_type_int>;
-    const auto is_long    = generic_type_test_base<const base_type_long>;
-    const auto is_char    = generic_type_test_base<const base_type_char>;
-    const auto is_float   = generic_type_test_base<const base_type_float>;
-    const auto is_double  = generic_type_test_base<const base_type_double>;
-    const auto is_boolean = generic_type_test_base<const base_type_boolean>;
+    constexpr auto is_void    = generic_type_test_base<const base_type_void>;
+    constexpr auto is_byte    = generic_type_test_base<const base_type_byte>;
+    constexpr auto is_short   = generic_type_test_base<const base_type_short>;
+    constexpr auto is_int     = generic_type_test_base<const base_type_int>;
+    constexpr auto is_long    = generic_type_test_base<const base_type_long>;
+    constexpr auto is_char    = generic_type_test_base<const base_type_char>;
+    constexpr auto is_float   = generic_type_test_base<const base_type_float>;
+    constexpr auto is_double  = generic_type_test_base<const base_type_double>;
+    constexpr auto is_boolean = generic_type_test_base<const base_type_boolean>;
 
     /* exp -> bool */
     bool is_true_constant_throws(const expression& e);
@@ -77,8 +77,8 @@ namespace Ast
             return generic_test<access, T>(arg);
         }
 
-    const auto is_public      = generic_access_test<const access_public>;
-    const auto is_protected   = generic_access_test<const access_protected>;
+    constexpr auto is_public      = generic_access_test<const access_public>;
+    constexpr auto is_protected   = generic_access_test<const access_protected>;
 
     /* decl -> bool */
     template<typename T>
@@ -87,9 +87,9 @@ namespace Ast
             return generic_test<declaration, T>(arg);
         }
 
-    const auto is_field       = generic_declaration_test<const declaration_field>;
-    const auto is_method      = generic_declaration_test<const declaration_method>;
-    const auto is_constructor = generic_declaration_test<const declaration_constructor>;
+    constexpr auto is_field       = generic_declaration_test<const declaration_field>;
+    constexpr auto is_method      = generic_declaration_test<const declaration_method>;
+    constexpr auto is_constructor = generic_declaration_test<const declaration_constructor>;
 
     /* type_decl -> bool */
     template<typename T>
@@ -98,8 +98,8 @@ namespace Ast
             return generic_test<type_declaration, T>(arg);
         }
 
-    const auto is_class       = generic_type_declaration_test<const type_declaration_class>;
-    const auto is_interface   = generic_type_declaration_test<const type_declaration_interface>;
+    constexpr auto is_class       = generic_type_declaration_test<const type_declaration_class>;
+    constexpr auto is_interface   = generic_type_declaration_test<const type_declaration_interface>;
 
     /** {3 Accessor helpers}  */
     std::string type_decl_name(const type_declaration& td);
