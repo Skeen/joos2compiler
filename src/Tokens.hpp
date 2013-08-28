@@ -3,6 +3,8 @@
 
 #include <boost/spirit/include/lex_lexertl.hpp>
 
+namespace lex = boost::spirit::lex;
+
 enum TypesStart
 {
     // 256 elements in each container
