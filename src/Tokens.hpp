@@ -1,17 +1,20 @@
 #ifndef _TOKENS_HPP
 #define _TOKENS_HPP
 
+#include <boost/spirit/include/lex_lexertl.hpp>
+
 enum TypesStart
 {
-    Specials            = 0x0000,
-    Comments            = 0x0100,
-    Keywords            = 0x0200,
-    Delimiters          = 0x0300,
-    AssignmentAndLogic  = 0x0400,
-    Comparison          = 0x0500,
-    Arithmetic          = 0x0600,
-    Literals            = 0x0700,
-    Identifier          = 0x0800
+    // 256 elements in each container
+    Specials            = (lex::min_token_id + 0x0100) & 0xFF00,
+    Comments            = Specials           + 0x0100,
+    Keywords            = Comments           + 0x0100,
+    Delimiters          = Keywords           + 0x0100,
+    AssignmentAndLogic  = Delimiters         + 0x0100,
+    Comparison          = AssignmentAndLogic + 0x0100,
+    Arithmetic          = Comparison         + 0x0100,
+    Literals            = Arithmetic         + 0x0100,
+    Identifier          = Literals           + 0x0100
 };
 
 enum SpecialsType
