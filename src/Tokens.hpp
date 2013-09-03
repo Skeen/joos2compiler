@@ -25,16 +25,16 @@ enum SpecialsType
     Specials_Start = Specials,
     // Values:
     END_OF_FILE,   // "\0" // NOTE: This is explicitly added after the lexing
-    END_OF_LINE,   // "\n", "\r" or "\r\n"
-    WHITESPACE,    // " " or "\t"
+    // END_OF_LINE,   // "\n", "\r" or "\r\n"
+    // WHITESPACE,    // " " or "\t"
 };
 
 enum CommentsType
 {
     Comments_Start = Comments,
     // Values:
-    BLOCK_COMMENT, // "/* ... */"
-    LINE_COMMENT   // "//"
+    // BLOCK_COMMENT, // "/* ... */"
+    // LINE_COMMENT   // "//"
 };
 
 enum KeywordsType
