@@ -39,7 +39,7 @@ namespace Ast
         Lexer::lexer_iterator_type begin = file_contents.begin();
         Lexer::lexer_iterator_type end   = file_contents.end();
         // Now let's run the lexer, and pipe it into the parser, to generate the source_file node.
-        bool b = lex::tokenize_and_parse(begin, end, lexi, parsi, source);
+        bool b = lex::tokenize_and_phrase_parse(begin, end, lexi, parsi, qi::in_state("WS")[lexi.self], source);
         // If we were able to lex and parse
         if(b)
         {
@@ -50,9 +50,9 @@ namespace Ast
         else
         {
             // Get the rest of the buffer
-            std::string rest(begin, end);
+            // std::string rest(begin, end);
             // Throw an exception corresponding to the error
-            throw Error::Syntax_Error(rest);
+            throw Error::Syntax_Error(file_contents.begin(), file_contents.end(), begin);
         }
     }
 }

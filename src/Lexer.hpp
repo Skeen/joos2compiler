@@ -20,13 +20,13 @@ namespace Lexer
 
         lex::token_def<std::string> identifier;
 
-        lex::token_def<> line_terminator;
-        lex::token_def<> whitespace;
+        lex::token_def<lex::omit> line_terminator;
+        lex::token_def<lex::omit> whitespace;
         lex::token_def<std::string> line_comment;
         lex::token_def<std::string> block_comment;
 
-        lex::token_def<> double_or;
-        lex::token_def<> double_plus;
+        lex::token_def<lex::omit> double_or;
+        lex::token_def<lex::omit> double_plus;
 
         java_tokens()
         {
@@ -68,12 +68,20 @@ namespace Lexer
         double_or       = "{OR_CHARACTER}{OR_CHARACTER}";
         double_plus     = "{PLUS_CHARACTER}{PLUS_CHARACTER}";
 
+        this->self("WS") = line_terminator
+                         | whitespace
+                         | line_comment
+                         | block_comment
+                         ;
+
         this->self.add
             // Specials
+            /*
             (line_terminator, END_OF_LINE)
             (whitespace,    WHITESPACE)
             (line_comment,  LINE_COMMENT)
             (block_comment, BLOCK_COMMENT)
+            */
             // Keywords
             ("abstract",    ABSTRACT)
             ("boolean",     BOOLEAN)
@@ -172,11 +180,11 @@ namespace Lexer
 namespace Lexer
 {
     // This is our input type (the type, used to expose the underlying input stream)
-     typedef std::string::iterator lexer_iterator_type;
+    typedef std::string::iterator lexer_iterator_type;
     // This is a list of all the attributes that the lexer exposes
     typedef boost::mpl::vector<std::string> lexer_exposed_types;
     // This is our token type
-    typedef lex::lexertl::token<lexer_iterator_type, lexer_exposed_types> lexer_token_type;
+    typedef lex::lexertl::token<lexer_iterator_type, lexer_exposed_types, boost::mpl::false_> lexer_token_type;
     // This is the general form type of our lexer
     typedef lex::lexertl::lexer<lexer_token_type> lexer_type;
     // This is our final lexer type (which can be used)

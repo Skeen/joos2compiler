@@ -6,6 +6,8 @@
 #include "ast_generate.hpp"
 #include "error.hpp"
 
+#include "lexer_debug.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -43,7 +45,7 @@ int main(int argc, char* argv[])
     // If we reach this, we've got arguments!
     // So let's read the files into strings;
     std::list<std::string> files_contents;
-    for(int x=0; x<argc; x++)
+    for(int x=1; x<argc; x++)
     {
         // Read the file in argv[x], into a string;
         std::string file_contents(read_from_file(argv[x]));
@@ -52,10 +54,13 @@ int main(int argc, char* argv[])
     }
     // Start running the compiler
     std::cout << "Applying phases:" << std::endl;
+    
+        // Debug our lexer
+        Lexer::debug_lexer(files_contents.front());
     try
     {
         // Let's lex and parse the input;
-        Ast::program ast = apply_phase<Ast::program, std::list<std::string>>("lexing & parsing", Ast::generate_ast, files_contents);
+        // Ast::program ast = apply_phase<Ast::program, std::list<std::string>>("lexing & parsing", Ast::generate_ast, files_contents);
         // Pretty print the ast
         // Ast::pretty_print(ast);
         // Let's weed the ast
