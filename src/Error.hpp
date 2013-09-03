@@ -1,31 +1,31 @@
 #ifndef _ERROR_HPP
 #define _ERROR_HPP
 
+#include <string>
+#include <exception>
+
 namespace Error
 {
     struct Generic_Error : std::exception
     {
         private:
-            const std::string error_text;
+            std::string error_text;
+
         protected:
-            Generic_Error(std::string error_text)
-                : error_text(error_text)
-            {
-            }
+            Generic_Error(std::string error_text);
+            Generic_Error(std::string error_text_init, std::string::iterator raw_input_start, std::string::iterator raw_input_end, std::string::iterator begin);
+            /*
+            Generic_Error(std::string error_text_init, std::string raw_input, std::string::iterator begin, std::string::iterator end);
+            */
         public:
-            const char* what() const noexcept final override
-            {
-                return error_text.c_str();
-            }
-            virtual ~Generic_Error() {}
+            const char* what() const noexcept final override;
+            virtual ~Generic_Error();
     };
 
     struct Syntax_Error : Generic_Error
     {
-        Syntax_Error(std::string issuing_string)
-            : Generic_Error(std::string("Syntax Error: ").append(issuing_string))
-        {
-        }
+        Syntax_Error();
+        Syntax_Error(std::string::iterator raw_input_start, std::string::iterator raw_input_end, std::string::iterator begin);
     };
 }
 
