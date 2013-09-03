@@ -1,7 +1,7 @@
 #ifndef _LEXER_HPP
 #define _LEXER_HPP
 
-#define BOOST_SPIRIT_LEXERTL_DEBUG
+#include "Boost_Spirit_Config.hpp"
 #include <boost/spirit/include/lex_lexertl.hpp>
 
 #include "Tokens.hpp"
@@ -171,10 +171,18 @@ namespace Lexer
 
 namespace Lexer
 {
-    typedef java_tokens<lex::lexertl::lexer<>> lexer_type;
+    // This is our input type (the type, used to expose the underlying input stream)
+     typedef std::string::iterator lexer_iterator_type;
+    // This is a list of all the attributes that the lexer exposes
+    typedef boost::mpl::vector<std::string> lexer_exposed_types;
+    // This is our token type
+    typedef lex::lexertl::token<lexer_iterator_type, lexer_exposed_types> lexer_token_type;
+    // This is the general form type of our lexer
+    typedef lex::lexertl::lexer<lexer_token_type> lexer_type;
+    // This is our final lexer type (which can be used)
+    typedef java_tokens<lexer_type> lexer;
+    // This is the output (iterator) type of our lexer
+    typedef lexer::iterator_type lexer_iterator;
 }
-/*
-#include "Lexer_impl.hpp"
-*/
 
 #endif //_LEXER_HPP

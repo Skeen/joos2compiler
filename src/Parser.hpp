@@ -1,113 +1,74 @@
 #ifndef _PARSER_HPP
 #define _PARSER_HPP
 
-#define BOOST_SPIRIT_LEXERTL_DEBUG
-#include <boost/spirit/include/lex_lexertl.hpp>
-#include <boost/bind.hpp>
-#include <boost/ref.hpp>
+#include "Boost_Spirit_Config.hpp"
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix/function/adapt_function.hpp>
 
-#include <boost/range/iterator_range.hpp>
-#include <boost/range/algorithm.hpp>
-#include <boost/range/iterator.hpp>
+namespace phoenix = boost::phoenix;
+namespace qi  = boost::spirit::qi;
 
 #include <string>
 
 #include "Tokens.hpp"
-
-struct token_collector_string
-{
-    typedef void result_type;
-
-    void operator()(char c, std::string& str) const
-    {
-        str.push_back(c);
-    }
-};
-
-struct token_collector
-{
-    typedef bool result_type;
-
-    template <typename Token>
-    bool operator()(Token const& t, std::vector<std::pair<unsigned, std::string>>& c) const
-    {
-        switch(t.id())
-        {
-            case WHITESPACE:
-                c.push_back(std::make_pair(WHITESPACE, "WHITESPACE"));
-                break;
-            case END_OF_LINE:
-                c.push_back(std::make_pair(END_OF_LINE, "END_OF_LINE"));
-                break;
-            default:
-                std::string str;
-                boost::for_each(t.value(),
-                        boost::bind(token_collector_string(), _1, boost::ref(str)));
-                c.push_back(std::make_pair(t.id(), str));
-                break;
-        }
-        return true;
-    }
-};
+#include "Ast.hpp"
 
 namespace Parser
 {
-    typedef token_collector parser_type;
+    /*
+       ast::expression* build_binop_expression(ast::expression* t1, ast::binop* operatur, ast::expression* t2)
+       {
+       return (new ast::binop_expression(t1, operatur, t2));
+       }
+       BOOST_PHOENIX_ADAPT_FUNCTION(ast::expression*, build_binop_expression_, build_binop_expression, 3)
+       */
 
-    // lex is the lexer (token definition instance) needed to invoke the lexical analyzer
-    template<typename LEXER, typename PARSER>
-    Ast::program lex_parse(std::string file_contents)
+    ///////////////////////////////////////////////////////////////////////////////
+    //  Grammar definition
+    ///////////////////////////////////////////////////////////////////////////////
+    template <typename Iterator>
+        struct java_grammar : qi::grammar<Iterator, Ast::source_file()>
     {
-        // Instance the lexer
-        LEXER lex;
-        PARSER parse;
-
-        // tokenize the given string, the bound functor gets invoked for each of 
-        // the matched tokens
-        char const* first = file_contents.c_str();
-        char const* last = &first[file_contents.size()];
-
-        std::vector<std::pair<unsigned, std::string>> vec;
-        bool r = lex::tokenize(first, last, lex, 
-                boost::bind(parse, _1, boost::ref(vec)));
-        vec.push_back(std::make_pair(END_OF_FILE, "END_OF_FILE"));
-
-        // print results
-        if (r) {
-            std::cout << "tokens are:" << std::endl;
-            for(std::pair<unsigned, std::string> value : vec)
+        template <typename TokenDef>
+            java_grammar(TokenDef const& tok)
+            : java_grammar::base_type(start)
             {
-                std::cout << find_enum_type(std::get<0>(value)) << ":\t" << std::get<1>(value) << std::endl;
-            }
-        }
-        else {
-            std::string rest(first, last);
-            std::cout << "Lexical analysis failed\n" << "stopped at: \"" 
-                << rest << "\"\n";
-        }
-        
-        exit(-1);
-        return Ast::program();
+                start = qi::token(PACKAGE) >> tok.identifier >> qi::token(SEMI_COLON) [ qi::_val = Ast::source_file() ]
+                    ;
+                /*
+                   expression = (term >> tok.plus  >> term) [ qi::_val = build_binop_expression_(qi::_1, phoenix::new_<ast::binop_plus>(), qi::_2) ]
+                   | (term >> tok.minus >> term) [ qi::_val = build_binop_expression_(qi::_1, phoenix::new_<ast::binop_minus>(), qi::_2) ]
+                   | term                        [ qi::_val = qi::_1 ]
+                   ;
 
-/*
-        // Local variable, to pass reference to
-        Ast::program program;
-        // tokenize and parse the program
-        bool r = lex::tokenize(first, last, lex, boost::bind(parse, _1, boost::ref(program)));
-        // Evaluate results
-        if (r) 
-        {
-            // Succesful parsing
-            return program;
-        }
-        else 
-        {
-            std::string rest(first, last);
-            std::cout << "Lexical analysis failed\n" << "stopped at: \"" << rest << "\"\n";
-            exit(-1);
-        }
-        */
-    }
+                   term = (factor >> tok.multiplication >> factor)   [ qi::_val = build_binop_expression_(qi::_1, phoenix::new_<ast::binop_times>(), qi::_2) ]
+                   | (factor >> tok.division       >> factor)   [ qi::_val = build_binop_expression_(qi::_1, phoenix::new_<ast::binop_divide>(), qi::_2) ]
+                   | factor                                     [ qi::_val = qi::_1 ]
+                   ;
+
+                   factor = (tok.minus >> plus_factor)               [ qi::_val = build_unary_minus_expression_(qi::_1) ]
+                   | plus_factor                              [ qi::_val = qi::_1 ]
+                   ;
+
+                   plus_factor = tok.number                        [ qi::_val = build_integer_constant_expression_(qi::_1) ]
+                   | (tok.left_paren >> expression >> tok.right_paren) [ qi::_val = qi::_1 ]
+                   ;
+                   } 
+                   */
+            }  
+        qi::rule<Iterator, Ast::source_file()> start;
+    /*
+        qi::rule<Iterator, ast::expression*()> expression;
+        qi::rule<Iterator, ast::expression*()> term;
+        qi::rule<Iterator, ast::expression*()> factor;
+        qi::rule<Iterator, ast::expression*()> plus_factor;
+       */    
+    };
+
+
+    template<typename T>
+    using parser = java_grammar<T>;
 }
 
 #endif // _PARSER_HPP
