@@ -56,13 +56,13 @@ int main(int argc, char* argv[])
     std::cout << "Applying phases:" << std::endl;
     
         // Debug our lexer
-        Lexer::debug_lexer(files_contents.front());
+        // Lexer::debug_lexer(files_contents.front());
     try
     {
         // Let's lex and parse the input;
-        // Ast::program ast = apply_phase<Ast::program, std::list<std::string>>("lexing & parsing", Ast::generate_ast, files_contents);
+        Ast::program ast = apply_phase<Ast::program, std::list<std::string>>("lexing & parsing", Ast::generate_ast, files_contents);
         // Pretty print the ast
-        // Ast::pretty_print(ast);
+        Ast::pretty_print(ast);
         // Let's weed the ast
         // WAst::program wast = apply_phase("weeding", weed, ast);
     }

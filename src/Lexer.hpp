@@ -30,28 +30,28 @@ namespace Lexer
 
         java_tokens()
         {
-        // Define regex macros
-        this->self.add_pattern
-            ("DIGIT",           "[0-9]")
-            ("NON_ZERO_DIGIT",  "[1-9]")
-            ("OCTAL_DIGIT",     "[0-7]")
-            ("ZERO_TO_THREE",   "[0-3]")
-            ("LINE_FEED",       "\n")
-            ("CARRIAGE_RETURN", "\r")
-            ("SPACE",           " ")
-            ("HORIZONTAL_TAB",  "\t")
-            ("OR_CHARACTER",    "\\|")
-            ("STAR_CHARACTER",  "\\*")
-            ("PLUS_CHARACTER",  "\\+")
-            ("ASCII_CHARACTER", "[\\000-\\255]")
-            ("LATIN1_LETTER",   "[A-Z]|[a-z]") //"[A-Z]|[a-z]|\\0170|\\181|\\186|[\\192-\\214]|[\\216-\\246]|[\\248-\\255]")
-            ("JAVA_LETTER",     "{LATIN1_LETTER}|$|_")
-            ("JAVA_LETTER_OR_DIGIT", "{JAVA_LETTER}|{DIGIT}")
-            ("OCTAL_ESCAPE",    "\\\\{ZERO_TO_THREE}{OCTAL_DIGIT}{OCTAL_DIGIT}|{OCTAL_DIGIT}{OCTAL_DIGIT}?")
-            ("ESCAPE_SEQUENCE", "\\\\b|\\\\t|\\\\n|\\\\f|\\\\r|\\\\\\\"|'|\\\\\\\\|{OCTAL_ESCAPE}") 
-            ("SINGLE_CHARACTER", "[^\r\n'\\\\\\\\]|{ESCAPE_SEQUENCE}")
-            ("STRING_CHARACTER", "[^\r\n\"\\\\\\\\]|{ESCAPE_SEQUENCE}")
-        ;
+            // Define regex macros
+            this->self.add_pattern
+                ("DIGIT",           "[0-9]")
+                ("NON_ZERO_DIGIT",  "[1-9]")
+                ("OCTAL_DIGIT",     "[0-7]")
+                ("ZERO_TO_THREE",   "[0-3]")
+                ("LINE_FEED",       "\n")
+                ("CARRIAGE_RETURN", "\r")
+                ("SPACE",           " ")
+                ("HORIZONTAL_TAB",  "\t")
+                ("OR_CHARACTER",    "\\|")
+                ("STAR_CHARACTER",  "\\*")
+                ("PLUS_CHARACTER",  "\\+")
+                ("ASCII_CHARACTER", "[\\000-\\255]")
+                ("LATIN1_LETTER",   "[A-Z]|[a-z]") //"[A-Z]|[a-z]|\\0170|\\181|\\186|[\\192-\\214]|[\\216-\\246]|[\\248-\\255]")
+                ("JAVA_LETTER",     "{LATIN1_LETTER}|$|_")
+                ("JAVA_LETTER_OR_DIGIT", "{JAVA_LETTER}|{DIGIT}")
+                ("OCTAL_ESCAPE",    "\\\\{ZERO_TO_THREE}{OCTAL_DIGIT}{OCTAL_DIGIT}|{OCTAL_DIGIT}{OCTAL_DIGIT}?")
+                ("ESCAPE_SEQUENCE", "\\\\b|\\\\t|\\\\n|\\\\f|\\\\r|\\\\\\\"|'|\\\\\\\\|{OCTAL_ESCAPE}") 
+                ("SINGLE_CHARACTER", "[^\r\n'\\\\\\\\]|{ESCAPE_SEQUENCE}")
+                ("STRING_CHARACTER", "[^\r\n\"\\\\\\\\]|{ESCAPE_SEQUENCE}")
+                ;
 
         // Define the tokens' regular expressions
         decimal_literal     = "0|{NON_ZERO_DIGIT}{DIGIT}*";
@@ -68,11 +68,11 @@ namespace Lexer
         double_or       = "{OR_CHARACTER}{OR_CHARACTER}";
         double_plus     = "{PLUS_CHARACTER}{PLUS_CHARACTER}";
 
-        this->self("WS") = line_terminator
-                         | whitespace
-                         | line_comment
-                         | block_comment
-                         ;
+        this->self += whitespace      [ lex::_pass = lex::pass_flags::pass_ignore ]
+                    | line_terminator [ lex::_pass = lex::pass_flags::pass_ignore ]
+                    | line_comment    [ lex::_pass = lex::pass_flags::pass_ignore ]
+                    | block_comment   [ lex::_pass = lex::pass_flags::pass_ignore ]
+                   ;
 
         this->self.add
             // Specials
@@ -186,7 +186,7 @@ namespace Lexer
     // This is our token type
     typedef lex::lexertl::token<lexer_iterator_type, lexer_exposed_types, boost::mpl::false_> lexer_token_type;
     // This is the general form type of our lexer
-    typedef lex::lexertl::lexer<lexer_token_type> lexer_type;
+    typedef lex::lexertl::actor_lexer<lexer_token_type> lexer_type;
     // This is our final lexer type (which can be used)
     typedef java_tokens<lexer_type> lexer;
     // This is the output (iterator) type of our lexer

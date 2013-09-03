@@ -39,7 +39,7 @@ namespace Ast
         Lexer::lexer_iterator_type begin = file_contents.begin();
         Lexer::lexer_iterator_type end   = file_contents.end();
         // Now let's run the lexer, and pipe it into the parser, to generate the source_file node.
-        bool b = lex::tokenize_and_phrase_parse(begin, end, lexi, parsi, qi::in_state("WS")[lexi.self], source);
+        bool b = lex::tokenize_and_parse(begin, end, lexi, parsi, source);
         // If we were able to lex and parse
         if(b)
         {
