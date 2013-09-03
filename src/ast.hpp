@@ -803,6 +803,11 @@ namespace Ast
     /* *************** Programs **************** */
     struct source_file
     {
+        // TODO: Get rid of this, or atleast make it private friend
+        source_file()
+        {
+        }
+
         source_file(std::string name, Maybe<const package_declaration*> package, std::list<const import_declaration*> imports, const type_declaration* type)
             : name(name), package(package), imports(imports), type(type)
         {

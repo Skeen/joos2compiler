@@ -1,6 +1,7 @@
 #ifndef _TOKENS_HPP
 #define _TOKENS_HPP
 
+#include "Boost_Spirit_Config.hpp"
 #include <boost/spirit/include/lex_lexertl.hpp>
 
 namespace lex = boost::spirit::lex;
