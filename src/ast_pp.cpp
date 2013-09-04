@@ -874,7 +874,7 @@ namespace Ast
         // Print imports
         unpack_list(sf.imports, pretty_print);
         // Print the type, inside the file
-        pretty_print(sf.type);
+        //pretty_print(sf.type);
         
         // End Marker
         std::cout << ">>>> File: " << sf.name << " End <<<<" << std::endl;
