@@ -40,23 +40,25 @@ namespace Parser
         }
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<const Ast::package_declaration*>, build_optional_package_, build_optional_package, 1)
-
-    Ast::name* build_simple_name(std::string str)
-    {
-        std::cout << "P" << std::endl;
-        return (new Ast::name_simple(Ast::identifier(str)));
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::name*, build_simple_name_, build_simple_name, 1)
     
-    Ast::name* build_qualified_name(Ast::name* name, std::string str)
+    Ast::name* build_name(std::string str, std::vector<std::string> vec)
     {
-        std::cout << "B" << std::endl;
-        std::list<Ast::identifier> qualified_name = Ast::name_to_identifier_list(name);
-        qualified_name.push_back(Ast::identifier(str));
-
-        return (new Ast::name_qualified(qualified_name));
+        if(vec.size() == 0)
+        {
+            return (new Ast::name_simple(Ast::identifier(str)));
+        }
+        else
+        {
+            std::list<Ast::identifier> qualified_name;
+            qualified_name.push_back(Ast::identifier(str));
+            for(std::string value : vec)
+            {
+                qualified_name.push_back(Ast::identifier(value));
+            }
+            return (new Ast::name_qualified(qualified_name));
+        }
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::name*, build_qualified_name_, build_qualified_name, 2)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::name*, build_name_, build_name, 2)
 
     std::list<const Ast::import_declaration*> build_imports(std::vector<Ast::import_declaration*> imports)
     {
@@ -71,11 +73,24 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_on_demand_import_, build_on_demand_import, 1)
 
-    Ast::import_declaration* build_single_import(Ast::name* name, Ast::identifier class_name)
+    Ast::import_declaration* build_single_import(Ast::name* name)
     {
-        return (new Ast::import_declaration_single(name, class_name));
+        std::list<Ast::identifier> qualified_name = Ast::name_to_identifier_list(name);
+        // A single import statement, has the form of id(.id)+, this means
+        // atleast 2 identifiers, otherwise there's a syntax error.
+        if(qualified_name.size() < 2)
+        {
+            assert(false);
+        }
+        else
+        {
+            Ast::identifier class_name = qualified_name.back();
+            qualified_name.pop_back();
+
+            return (new Ast::import_declaration_single(new Ast::name_qualified(qualified_name), class_name));
+        }
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_single_import_, build_single_import, 2)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_single_import_, build_single_import, 1)
 
     ///////////////////////////////////////////////////////////////////////////////
     //  Grammar definition
@@ -87,11 +102,11 @@ namespace Parser
             java_grammar(TokenDef const& tok)
             : java_grammar::base_type(start)
             {
-                start = source_file [ qi::_val = qi::_1 ]
+                start = source_file [ qi::_val = qi::_1 ] >> qi::eoi
                       ;
-
-                source_file = /*(*/optional_package/* >> imports)*/
-                                [ qi::_val = build_source_file_(qi::_1, std::list<const Ast::import_declaration*>()) ]
+                
+                source_file = (optional_package >> imports)// > qi::eoi)
+                                [ qi::_val = build_source_file_(qi::_1, qi::_2) ]
                       ;
 
                 optional_package = (-package)
@@ -101,38 +116,28 @@ namespace Parser
                 package = (qi::raw_token(PACKAGE) >> name >> qi::raw_token(SEMI_COLON))
                                 [ qi::_val = qi::_1 ]
                       ;
-/*
+
                 imports = (*import)
                                 [ qi::_val = build_imports_(qi::_1) ]
                       ;
 
                 import  = (qi::raw_token(IMPORT) >> name >> qi::raw_token(DOT) >> qi::raw_token(STAR) >> qi::raw_token(SEMI_COLON))
                                 [ qi::_val = build_on_demand_import_(qi::_1) ]
-                        | (qi::raw_token(IMPORT) >> name >> qi::raw_token(DOT) >> tok.identifier >> qi::raw_token(SEMI_COLON))
-                                [ qi::_val = build_single_import_(qi::_1, qi::_2) ]
-                      ;
-*/
-                name = simple_name      [ qi::_val = qi::_1 ]
-                     | qualified_name   [ qi::_val = qi::_1 ]
-                     ;
+                        | (qi::raw_token(IMPORT) >> name >> qi::raw_token(SEMI_COLON))
+                                [ qi::_val = build_single_import_(qi::_1) ]
+                        ;
 
-                simple_name = (tok.identifier)
-                                [ qi::_val = build_simple_name_(qi::_1) ]
-                            ;
-                qualified_name = (name >> qi::raw_token(DOT) >> tok.identifier)
-                                [ qi::_val = build_qualified_name_(qi::_1, qi::_2) ]
-                     ;
-
+                name = (tok.identifier >> *(qi::raw_token(DOT) >> tok.identifier))
+                                [ qi::_val = build_name_(qi::_1, qi::_2) ]
+                    ;
             }  
         qi::rule<Iterator, Ast::source_file()> start;
         qi::rule<Iterator, Ast::source_file()> source_file;
         qi::rule<Iterator, Maybe<const Ast::package_declaration*>()> optional_package;
         qi::rule<Iterator, Ast::package_declaration*()> package;
-        //qi::rule<Iterator, std::list<const Ast::import_declaration*>()> imports;
-        //qi::rule<Iterator, Ast::import_declaration*()> import;
+        qi::rule<Iterator, std::list<const Ast::import_declaration*>()> imports;
+        qi::rule<Iterator, Ast::import_declaration*()> import;
         qi::rule<Iterator, Ast::name*()> name;
-        qi::rule<Iterator, Ast::name*()> simple_name;
-        qi::rule<Iterator, Ast::name*()> qualified_name;
     };
 
 
