@@ -10,6 +10,10 @@
 /************************************************************************/
 namespace Ast
 {
+    std::list<identifier> name_to_identifier_list(name_simple navn);
+    std::list<identifier> name_to_identifier_list(name_qualified navn);
+    std::list<identifier> name_to_identifier_list(const name* navn);
+
     /** {3 Converstion helpers} */
     /** Convert a name to its string representation */
     std::string name_to_string(const name* navn);

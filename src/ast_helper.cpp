@@ -8,32 +8,47 @@
 
 namespace Ast
 {
-    /** Convert a name to its string representation */
-    std::string name_to_string(const name* navn)
+    std::list<identifier> name_to_identifier_list(name_simple navn)
     {
-        // Get a list of identifiers
-        std::list<identifier> identifiers;
+        std::list<identifier> output;
+        output.push_back(navn.name);
+        return output;
+    }
+
+    std::list<identifier> name_to_identifier_list(name_qualified navn)
+    {
+        return navn.name;
+    }
+
+    std::list<identifier> name_to_identifier_list(const name* navn)
+    {
         Match(navn)
         {
             Case(const name_simple navn)
             {
-                // Add one to the list of identifiers
-                identifiers.push_back(navn.name);
+                return name_to_identifier_list(navn);
             }
 
             Case(const name_qualified navn)
             {
-                // Assign the list of identifiers
-                identifiers = navn.name;
+                return name_to_identifier_list(navn);
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }
         }
         EndMatch;
+        return std::list<identifier>();
+    }
 
+    /** Convert a name to its string representation */
+    std::string name_to_string(const name* navn)
+    {
+        // Get a list of identifiers
+        std::list<identifier> identifiers = name_to_identifier_list(navn);
+        // Generate output string
         std::string output_name = "";
         // Transform list of identifiers into a string
         for(identifier id : identifiers)
@@ -91,7 +106,7 @@ namespace Ast
                 return interface.type.name.identifier_string;
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -119,7 +134,7 @@ namespace Ast
                 return "Interface";
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -142,7 +157,7 @@ namespace Ast
                 return "protected";
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -200,7 +215,7 @@ namespace Ast
                 return "boolean";
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -223,7 +238,7 @@ namespace Ast
                 return "~";
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -261,7 +276,7 @@ namespace Ast
                 return "%";
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }

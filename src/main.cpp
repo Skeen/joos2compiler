@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     std::cout << "Applying phases:" << std::endl;
     
         // Debug our lexer
-        // Lexer::debug_lexer(files_contents.front());
+        Lexer::debug_lexer(files_contents.front());
     try
     {
         // Let's lex and parse the input;

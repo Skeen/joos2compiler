@@ -1,5 +1,6 @@
-package a;
+package a.D;
 import A.D.Lol;
+import A.D.W;
 
 public abstract class
 {
