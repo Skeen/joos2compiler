@@ -33,7 +33,7 @@ namespace Ast
                 pretty_print(type);
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -78,7 +78,7 @@ namespace Ast
                 pretty_print(lvalue);
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -215,7 +215,7 @@ namespace Ast
                 pretty_print(exp);
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -368,7 +368,7 @@ namespace Ast
                 std::cout << "--";
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -473,7 +473,7 @@ namespace Ast
                 pretty_print(stm);
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -611,7 +611,7 @@ namespace Ast
                 pretty_print(constructor);
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -755,7 +755,7 @@ namespace Ast
                 pretty_print(interface);
             }
             
-            Otherwise()
+            When()
             {
                 assert(false);
             }
@@ -830,13 +830,15 @@ namespace Ast
             Case(const import_declaration_on_demand import)
             {
                 pretty_print(import);
+                return;
             }
             Case(const import_declaration_single import)
             {
                 pretty_print(import);
+                return;
             }
 
-            Otherwise()
+            When()
             {
                 assert(false);
             }

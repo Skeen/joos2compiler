@@ -31,22 +31,18 @@ namespace Ast
     {
         // We'll instance our lexer
         Lexer::lexer lexi;
-        std::cout << "W" << std::endl;
         // And our parser, based upon our lexer
         Parser::parser<Lexer::lexer_iterator> parsi(lexi);
-        std::cout << "Q" << std::endl;
         // Then we'll prepare an output variable
         Ast::source_file source;
         // And we'll prepare our input iterators
         Lexer::lexer_iterator_type begin = file_contents.begin();
         Lexer::lexer_iterator_type end   = file_contents.end();
     
-        std::cout << "L" << std::endl;
         // Now let's run the lexer, and pipe it into the parser, to generate the source_file node.
         bool b = lex::tokenize_and_parse(begin, end, lexi, parsi, source);
-        std::cout << "D" << std::endl;
         // If we were able to lex and parse
-        if(b && (begin == end))
+        if(b)
         {
             // Return the parsed ast node
             return source;
