@@ -875,7 +875,7 @@ namespace Ast
     {
         Match(import)
         {
-            Case(const import_declaration_on_demand* import)
+            Case(const import_declaration_on_demand import)
             {
                 pretty_print(import);
                 break;
