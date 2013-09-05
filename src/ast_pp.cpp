@@ -21,19 +21,22 @@ namespace Ast
             Case(const type_expression_base type)
             {
                 pretty_print(type);
+                break;
             }
             
             Case(const type_expression_tarray type)
             {
                 pretty_print(type);
+                break;
             }
             
             Case(const type_expression_named type)
             {
                 pretty_print(type);
+                break;
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -66,19 +69,22 @@ namespace Ast
             Case(const lvalue_non_static_field lvalue)
             {
                 pretty_print(lvalue);
+                break;
             }
 
             Case(const lvalue_array lvalue)
             {
                 pretty_print(lvalue);
+                break;
             }
 
             Case(const lvalue_array lvalue)
             {
                 pretty_print(lvalue);
+                break;
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -113,109 +119,130 @@ namespace Ast
             Case(const expression_binop exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_unop exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_integer_constant exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_character_constant exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_string_constant exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_boolean_constant exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_null exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_this exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_static_invoke exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_non_static_invoke exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_simple_invoke exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_ambiguous_invoke exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_new exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_new_array exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_lvalue exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_assignment exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_incdec exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_cast exp)
             {
                 pretty_print(exp);
+                break;
             }
 
             Case(const expression_ambiguous_cast exp)
             {
                 pretty_print(exp);
+                break;
             }
             
             Case(const expression_instance_of exp)
             {
                 pretty_print(exp);
+                break;
             }
             
             Case(const expression_parentheses exp)
             {
                 pretty_print(exp);
+                break;
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -348,27 +375,31 @@ namespace Ast
             {
                 std::cout << "++";
                 pretty_print(exp.variable);
+                break;
             }
 
             Case(const inc_dec_op_predec op)
             {
                 std::cout << "--";
                 pretty_print(exp.variable);
+                break;
             }
 
             Case(const inc_dec_op_postinc op)
             {
                 pretty_print(exp.variable);
                 std::cout << "++";
+                break;
             }
 
             Case(const inc_dec_op_postdec op)
             {
                 pretty_print(exp.variable);
                 std::cout << "--";
+                break;
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -416,64 +447,76 @@ namespace Ast
             Case(const statement_expression stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_if_then stm)
             {
                 pretty_print(stm);
+                break;
             }
 
             Case(const statement_if_then_else stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_while stm)
             {
                 pretty_print(stm);
+                break;
             }
 
             Case(const statement_empty stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_block stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_void_return stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_value_return stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_local_declaration stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_throw stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_super_call stm)
             {
                 pretty_print(stm);
+                break;
             }
             
             Case(const statement_this_call stm)
             {
                 pretty_print(stm);
+                break;
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -599,19 +642,22 @@ namespace Ast
             Case(const declaration_field field)
             {
                 pretty_print(field);
+                break;
             }
             
             Case(const declaration_method method)
             {
                 pretty_print(method);
+                break;
             }
 
             Case(const declaration_constructor constructor)
             {
                 pretty_print(constructor);
+                break;
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -748,14 +794,16 @@ namespace Ast
             Case(const type_declaration_class klass)
             {
                 pretty_print(klass);
+                break;
             }
 
             Case(const type_declaration_interface interface)
             {
                 pretty_print(interface);
+                break;
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -827,18 +875,18 @@ namespace Ast
     {
         Match(import)
         {
-            Case(const import_declaration_on_demand import)
+            Case(const import_declaration_on_demand* import)
             {
                 pretty_print(import);
-                return;
+                break;
             }
             Case(const import_declaration_single import)
             {
                 pretty_print(import);
-                return;
+                break;
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }

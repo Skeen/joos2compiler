@@ -22,11 +22,11 @@ namespace qi  = boost::spirit::qi;
 
 namespace Parser
 {
-    Ast::source_file build_source_file(Maybe<const Ast::package_declaration*> package_decl, std::list<const Ast::import_declaration*> imports_decl)
+    Ast::source_file build_source_file(Maybe<const Ast::package_declaration*> package_decl, std::list<const Ast::import_declaration*> imports_decl, Ast::type_declaration* type_decl)
     {
-        return Ast::source_file(std::string("test"), package_decl, imports_decl, nullptr);
+        return Ast::source_file(std::string("test"), package_decl, imports_decl, type_decl);
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::source_file, build_source_file_, build_source_file, 2)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::source_file, build_source_file_, build_source_file, 3)
 
     Maybe<const Ast::package_declaration*> build_optional_package(boost::optional<Ast::package_declaration*> package_decl)
     {
@@ -73,14 +73,18 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_on_demand_import_, build_on_demand_import, 1)
 
-    Ast::import_declaration* build_single_import(Ast::name* name)
+    Ast::import_declaration* build_single_import(Ast::name* name, bool& pass)
     {
         std::list<Ast::identifier> qualified_name = Ast::name_to_identifier_list(name);
         // A single import statement, has the form of id(.id)+, this means
         // atleast 2 identifiers, otherwise there's a syntax error.
         if(qualified_name.size() < 2)
         {
+            pass = false;
+            // TODO: Get rid of this assert false, really we should just trigger
+            // a parse error, using the pass = false statement.
             assert(false);
+            return nullptr;
         }
         else
         {
@@ -90,7 +94,7 @@ namespace Parser
             return (new Ast::import_declaration_single(new Ast::name_qualified(qualified_name), class_name));
         }
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_single_import_, build_single_import, 1)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_single_import_, build_single_import, 2)
 
     ///////////////////////////////////////////////////////////////////////////////
     //  Grammar definition
@@ -105,8 +109,8 @@ namespace Parser
                 start = source_file [ qi::_val = qi::_1 ] >> qi::eoi
                       ;
                 
-                source_file = (optional_package >> imports)// > qi::eoi)
-                                [ qi::_val = build_source_file_(qi::_1, qi::_2) ]
+                source_file = (optional_package >> imports >> type)
+                                [ qi::_val = build_source_file_(qi::_1, qi::_2, qi::_3) ]
                       ;
 
                 optional_package = (-package)
@@ -124,8 +128,12 @@ namespace Parser
                 import  = (qi::raw_token(IMPORT) >> name >> qi::raw_token(DOT) >> qi::raw_token(STAR) >> qi::raw_token(SEMI_COLON))
                                 [ qi::_val = build_on_demand_import_(qi::_1) ]
                         | (qi::raw_token(IMPORT) >> name >> qi::raw_token(SEMI_COLON))
-                                [ qi::_val = build_single_import_(qi::_1) ]
+                                [ qi::_val = build_single_import_(qi::_1, qi::_pass) ]
                         ;
+
+                type = (class_type)      [ qi::_val = qi::_1 ]
+                     | (interface_type)  [ qi::_val = qi::_1 ]
+                     ;
 
                 name = (tok.identifier >> *(qi::raw_token(DOT) >> tok.identifier))
                                 [ qi::_val = build_name_(qi::_1, qi::_2) ]
@@ -137,6 +145,9 @@ namespace Parser
         qi::rule<Iterator, Ast::package_declaration*()> package;
         qi::rule<Iterator, std::list<const Ast::import_declaration*>()> imports;
         qi::rule<Iterator, Ast::import_declaration*()> import;
+        qi::rule<Iterator, Ast::type_declaration*()> type;
+        qi::rule<Iterator, Ast::type_declaration*()> class_type;
+        qi::rule<Iterator, Ast::type_declaration*()> interface_type;
         qi::rule<Iterator, Ast::name*()> name;
     };
 
