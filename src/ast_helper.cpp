@@ -34,7 +34,7 @@ namespace Ast
                 return name_to_identifier_list(navn);
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -106,7 +106,7 @@ namespace Ast
                 return interface.type.name.identifier_string;
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -134,7 +134,7 @@ namespace Ast
                 return "Interface";
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -157,7 +157,7 @@ namespace Ast
                 return "protected";
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -215,7 +215,7 @@ namespace Ast
                 return "boolean";
             }
             
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -238,7 +238,7 @@ namespace Ast
                 return "~";
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }
@@ -276,7 +276,7 @@ namespace Ast
                 return "%";
             }
 
-            When()
+            Otherwise()
             {
                 assert(false);
             }
