@@ -73,10 +73,10 @@ namespace Ast
     struct base_type_byte final : inherit_super<base_type> {};
     struct base_type_short final : inherit_super<base_type> {};
     struct base_type_int final : inherit_super<base_type> {};
-    struct base_type_long final : inherit_super<base_type> {};
+    //struct base_type_long final : inherit_super<base_type> {};
     struct base_type_char final : inherit_super<base_type> {};
-    struct base_type_float final : inherit_super<base_type> {};
-    struct base_type_double final : inherit_super<base_type> {};
+    //struct base_type_float final : inherit_super<base_type> {};
+    //struct base_type_double final : inherit_super<base_type> {};
     struct base_type_boolean final : inherit_super<base_type> {};
 
     struct type_expression
@@ -110,7 +110,6 @@ namespace Ast
 
         const type_expression* type;
     };
-
     
     struct type_expression_named final : inherit_super<type_expression>
     {

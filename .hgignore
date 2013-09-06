@@ -4,4 +4,7 @@ syntax: glob
 include/*
 build/*
 *~
+*.pyc
 *.swp
+*.dblite
+*.stackdump
