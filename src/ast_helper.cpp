@@ -189,17 +189,17 @@ namespace Ast
             {
                 return "int";
             }
-
+/*
             Case(const base_type_long type)
             {
                 return "long";
             }
-
+*/
             Case(const base_type_char type)
             {
                 return "char";
             }
-
+/*
             Case(const base_type_float type)
             {
                 return "float";
@@ -209,7 +209,7 @@ namespace Ast
             {
                 return "double";
             }
-
+*/
             Case(const base_type_boolean type)
             {
                 return "boolean";

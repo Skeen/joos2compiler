@@ -815,6 +815,8 @@ namespace Ast
     {
         // Get the info struct
         class_declaration info = klass.type;
+        // Always public
+        std::cout << "public ";
         // Print final, if we are
         if(info.is_final)
         {
@@ -850,6 +852,8 @@ namespace Ast
     {
         // Get the info struct
         interface_declaration info = interface.type;
+        // Always public
+        std::cout << "public ";
         // Print the 'interface' keyword, and the interface name
         std::cout << "interface " << info.name.identifier_string;
         // If we're extend anything
@@ -894,7 +898,6 @@ namespace Ast
         EndMatch;
     }
 
-
     void pretty_print(const import_declaration_on_demand import)
     {
         const name* import_name = import.import;
@@ -924,7 +927,7 @@ namespace Ast
         // Print imports
         unpack_list(sf.imports, pretty_print);
         // Print the type, inside the file
-        //pretty_print(sf.type);
+        pretty_print(sf.type);
         
         // End Marker
         std::cout << ">>>> File: " << sf.name << " End <<<<" << std::endl;

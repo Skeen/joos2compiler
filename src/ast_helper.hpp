@@ -63,10 +63,10 @@ namespace Ast
     constexpr auto is_byte    = generic_type_test_base<const base_type_byte>;
     constexpr auto is_short   = generic_type_test_base<const base_type_short>;
     constexpr auto is_int     = generic_type_test_base<const base_type_int>;
-    constexpr auto is_long    = generic_type_test_base<const base_type_long>;
+    //constexpr auto is_long    = generic_type_test_base<const base_type_long>;
     constexpr auto is_char    = generic_type_test_base<const base_type_char>;
-    constexpr auto is_float   = generic_type_test_base<const base_type_float>;
-    constexpr auto is_double  = generic_type_test_base<const base_type_double>;
+    //constexpr auto is_float   = generic_type_test_base<const base_type_float>;
+    //constexpr auto is_double  = generic_type_test_base<const base_type_double>;
     constexpr auto is_boolean = generic_type_test_base<const base_type_boolean>;
 
     /* exp -> bool */
