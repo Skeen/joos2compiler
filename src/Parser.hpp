@@ -178,6 +178,118 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_expression_tarray*, build_array_typeexp_, build_array_typeexp, 2)
 
+    Ast::declaration_field* build_field_declaration(Ast::access* access_type, boost::fusion::vector2<boost::optional<boost::iterator_range<std::string::iterator>>, boost::optional<boost::iterator_range<std::string::iterator>>> is_static_is_final, Ast::type_expression* type, Ast::identifier name, Maybe<const Ast::expression*> optional_initializer)
+    {
+        // Read out static, has type boost::optional<*>, which is implicitly casted to bool
+        bool is_static = boost::fusion::at_c<0>(is_static_is_final);
+        // Read out final, has type boost::optional<*>, which is implicitly casted to bool
+        bool is_final = boost::fusion::at_c<1>(is_static_is_final);
+        // Create the field declaration
+        Ast::field_declaration field_decl = Ast::field_declaration(access_type, is_static, is_final, type, name, optional_initializer);
+        // And use that to create the declaration field
+        return (new Ast::declaration_field(field_decl));
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::declaration_field*, build_field_declaration_, build_field_declaration, 5)
+
+    Maybe<const Ast::expression*> build_optional_expression(boost::optional<Ast::expression*> optional)
+    {
+        if(optional)
+        {
+            return Maybe<const Ast::expression*>(*optional);
+        }
+        else
+        {
+            return Maybe<const Ast::expression*>();
+        }
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<const Ast::expression*>, build_optional_expression_, build_optional_expression, 1)
+
+    Ast::declaration_method* build_method_declaration(Ast::access* access_type, boost::fusion::vector3<boost::optional<boost::iterator_range<std::string::iterator>>, boost::optional<boost::iterator_range<std::string::iterator>>, boost::optional<boost::iterator_range<std::string::iterator>>> is_abstract_is_static_is_final, Ast::type_expression* type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Maybe<Ast::body> body)
+    {
+        // Read out abstract, has type boost::optional<*>, which is implicitly casted to bool
+        bool is_abstract = boost::fusion::at_c<0>(is_abstract_is_static_is_final);
+        // Read out static, has type boost::optional<*>, which is implicitly casted to bool
+        bool is_static = boost::fusion::at_c<1>(is_abstract_is_static_is_final);
+        // Read out final, has type boost::optional<*>, which is implicitly casted to bool
+        bool is_final = boost::fusion::at_c<2>(is_abstract_is_static_is_final);
+        // Create the method declaration
+        Ast::method_declaration method_decl = Ast::method_declaration(access_type, is_static, is_final, is_abstract, type, name, params, throws, body);
+        // And use that to create the declaration method
+        return (new Ast::declaration_method(method_decl));
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::declaration_method*, build_method_declaration_, build_method_declaration, 7)
+
+    Ast::declaration_constructor* build_constructor_declaration(Ast::access* access_type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Ast::body body)
+    {
+        Ast::constructor_declaration constructor_decl = Ast::constructor_declaration(access_type, name, params, throws, body);
+        // And use that to create the declaration method
+        return (new Ast::declaration_constructor(constructor_decl));
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::declaration_constructor*, build_constructor_declaration_, build_constructor_declaration, 5)
+
+    Maybe<Ast::body> build_optional_method_body(Ast::body body)
+    {
+        return Maybe<Ast::body>(body);
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<Ast::body>, build_optional_method_body_, build_optional_method_body, 1)
+
+    Ast::declaration_method* build_implicit_method_declaration(boost::optional<boost::iterator_range<std::string::iterator>> abstract_option, Ast::type_expression* type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Maybe<Ast::body> body)
+    {
+        // Read out abstract, has type boost::optional<*>, which is implicitly casted to bool
+        bool is_abstract = abstract_option;
+        // Create the method declaration
+        Ast::method_declaration method_decl = Ast::method_declaration(new Ast::access_public, false, false, is_abstract, type, name, params, throws, body);
+        // And use that to create the declaration method
+        return (new Ast::declaration_method(method_decl));
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::declaration_method*, build_implicit_method_declaration_, build_implicit_method_declaration, 6)
+
+    std::list<Ast::formal_parameter> build_formal_parameter_list(boost::optional<boost::fusion::vector2<Ast::formal_parameter, std::vector<Ast::formal_parameter>>> optional_list_of_params)
+    {
+        std::list<Ast::formal_parameter> return_list;
+        // If we matched anything, let's process it
+        if(optional_list_of_params)
+        {
+            // Get the matched vector
+            boost::fusion::vector2<Ast::formal_parameter, std::vector<Ast::formal_parameter>> list_of_params = *optional_list_of_params;
+            // Get the first type, which was matched
+            Ast::formal_parameter matched = boost::fusion::at_c<0>(list_of_params);
+            // Add this, to our return list
+            return_list.push_back(matched);
+            // Get the (possibly empty) list of futher matches
+            std::vector<Ast::formal_parameter> matched_list = boost::fusion::at_c<1>(list_of_params);
+            // Add each for these, to our return list
+            for(Ast::formal_parameter match : matched_list)
+            {
+                return_list.push_back(match);
+            }
+        }
+        // return the possibly empty list
+        return return_list;
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<Ast::formal_parameter>, build_formal_parameter_list_, build_formal_parameter_list, 1)
+
+    Ast::formal_parameter build_formal_parameter(Ast::type_expression* type, Ast::identifier name)
+    {
+        return std::make_pair(type, name);
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::formal_parameter, build_formal_parameter_, build_formal_parameter, 2)
+
+    std::list<const Ast::namedtype*> build_throws_clause(boost::optional<std::list<const Ast::namedtype*>> typenames)
+    {
+        // If we were passed a list of typenames simply return it
+        if(typenames)
+        {
+            return *typenames;
+        }
+        // Otherwise return the empty list
+        else
+        {
+            return std::list<const Ast::namedtype*>();
+        }
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<const Ast::namedtype*>, build_throws_clause_, build_throws_clause, 1)
+
     ///////////////////////////////////////////////////////////////////////////////
     //  Grammar definition
     ///////////////////////////////////////////////////////////////////////////////
@@ -264,6 +376,52 @@ namespace Parser
                                              | member_decl [ qi::_val = qi::_1 ]
                                              ;
 
+                field_declaration = (access >> (qi::token(STATIC) ^ qi::token(FINAL)) >> typeexp >> tok.identifier >> optional_intializer >> qi::raw_token(SEMI_COLON))
+                                     [ qi::_val = build_field_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5) ]
+                                  ;
+
+                optional_intializer = -(qi::raw_token(ASSIGN) >> expression)
+                                     [ qi::_val = build_optional_expression_(qi::_1) ]
+                                    ;
+
+                method_declaration = (access >> (qi::token(ABSTRACT) ^ qi::token(STATIC) ^ qi::token(FINAL)) >> typeexp >> tok.identifier >> method_parameters >> throws_clause >> optional_method_body)
+                                     [ qi::_val = build_method_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5, qi::_6, qi::_7) ]
+                                    ;
+
+                constructor_declaration = (access >> tok.identifier >> method_parameters >> throws_clause >> constructor_body)
+                                     [ qi::_val = build_constructor_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5) ]
+                                     ;
+
+                constructor_body = block [ qi::_val = qi::_1 ] ;
+
+                optional_method_body = (qi::raw_token(SEMI_COLON))
+                                        [ qi::_val = Maybe<Ast::body>() ]
+                                     | (method_body)
+                                        [ qi::_val = build_optional_method_body_(qi::_1) ]
+                                     ;
+
+                method_body = block [ qi::_val = qi::_1 ] ;
+
+                implicit_method_declaration = (-(qi::token(ABSTRACT)) >> typeexp >> tok.identifier >> method_parameters >> throws_clause >> optional_method_body)
+                                        [ qi::_val = build_implicit_method_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5, qi::_6) ]
+                                       ; 
+
+                method_parameters = (qi::raw_token(LEFT_PARENTHESE) >> formal_parameter_list >> qi::raw_token(RIGHT_PARENTHESE))
+                                        [ qi::_val = qi::_1 ]
+                                  ;
+
+                formal_parameter_list = (-(formal_parameter >> *(qi::raw_token(COMMA) >> formal_parameter)))
+                                        [ qi::_val = build_formal_parameter_list_(qi::_1) ]
+                                      ;
+
+                formal_parameter = (typeexp >> tok.identifier)
+                                        [ qi::_val = build_formal_parameter_(qi::_1, qi::_2) ]
+                                 ;
+        
+                throws_clause = (-(qi::raw_token(THROWS) >> typename_list))
+                                        [ qi::_val = build_throws_clause_(qi::_1) ]
+                                 ;
+
                 typeexp = primitive_typeexp [ qi::_val = qi::_1 ]
                         | reference_typeexp [ qi::_val = qi::_1 ]
                         ;
@@ -328,17 +486,29 @@ namespace Parser
         qi::rule<Iterator, std::list<const Ast::namedtype*>()> typename_list;
         qi::rule<Iterator, Ast::declaration*()> member_decl;
         qi::rule<Iterator, Ast::declaration*()> interface_member_declaration;
-        // Missing declaration start
-        qi::rule<Iterator, Ast::declaration_method*()> implicit_method_declaration;
-        qi::rule<Iterator, Ast::declaration_method*()> method_declaration;
-        qi::rule<Iterator, Ast::declaration_constructor*()> constructor_declaration;
         qi::rule<Iterator, Ast::declaration_field*()> field_declaration;
+        qi::rule<Iterator, Maybe<const Ast::expression*>()> optional_intializer;
+        qi::rule<Iterator, Ast::declaration_method*()> method_declaration;
+        qi::rule<Iterator, Maybe<Ast::body>()> optional_method_body;
+        qi::rule<Iterator, Ast::body()> method_body;
+        qi::rule<Iterator, Ast::declaration_constructor*()> constructor_declaration;
+        qi::rule<Iterator, std::list<const Ast::statement*>()> constructor_body;
+        qi::rule<Iterator, Ast::declaration_method*()> implicit_method_declaration;
+        qi::rule<Iterator, std::list<Ast::formal_parameter>()> method_parameters;
+        qi::rule<Iterator, std::list<Ast::formal_parameter>()> formal_parameter_list;
+        qi::rule<Iterator, Ast::formal_parameter()> formal_parameter;
+        qi::rule<Iterator, std::list<const Ast::namedtype*>()> throws_clause;
+        // Missing declaration start
+        qi::rule<Iterator, Ast::expression*()> expression;
+        qi::rule<Iterator, std::list<const Ast::statement*>()> block;
         // Missing declaration stop
         qi::rule<Iterator, Ast::type_expression*()> typeexp;
         qi::rule<Iterator, Ast::type_expression*()> reference_typeexp;
         qi::rule<Iterator, Ast::type_expression_base*()> primitive_typeexp;
         qi::rule<Iterator, Ast::type_expression_named*()> named_typeexp;
         qi::rule<Iterator, Ast::type_expression_tarray*()> array_typeexp;
+        // TODO: Shouldn't return a bool(), but rather an int, indicating the number
+        // of matches of the rule
         qi::rule<Iterator, bool()> empty_brackets;
         qi::rule<Iterator, Ast::access*()> access;
         qi::rule<Iterator, Ast::name*()> name;

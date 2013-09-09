@@ -18,6 +18,12 @@ namespace Ast
 {
     struct identifier
     {
+        // TODO: Get rid of this, or atleast make it private friend
+        identifier()
+            : position(lexer_null_value), identifier_string("ERROR: INVALID IDENTIFIER")
+        {
+        }
+
         identifier(std::string identifier_string, LexerPosition position = lexer_null_value)
             : position(position), identifier_string(identifier_string)
         {
@@ -649,7 +655,7 @@ namespace Ast
     struct access_public final : inherit_super<access> {};
     struct access_protected final : inherit_super<access> {};
 
-    typedef std::pair<const expression*, identifier> formal_parameter;
+    typedef std::pair<const type_expression*, identifier> formal_parameter;
 
     struct field_declaration
     {
@@ -686,8 +692,8 @@ namespace Ast
 
     struct constructor_declaration
     {
-        constructor_declaration(const access* access_type, identifier name, std::list<formal_parameter> formal_parameters, std::list<const namedtype*> throws, Maybe<body> method_body)
-            : access_type(access_type), name(name), formal_parameters(formal_parameters), throws(throws), method_body(method_body)
+        constructor_declaration(const access* access_type, identifier name, std::list<formal_parameter> formal_parameters, std::list<const namedtype*> throws, body constructor_body)
+            : access_type(access_type), name(name), formal_parameters(formal_parameters), throws(throws), constructor_body(constructor_body)
         {
         }
 
@@ -695,7 +701,7 @@ namespace Ast
         identifier name;
         std::list<formal_parameter> formal_parameters;
         std::list<const namedtype*> throws;
-        Maybe<body> method_body;
+        body constructor_body;
     };
 
     struct declaration
