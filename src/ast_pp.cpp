@@ -767,21 +767,15 @@ namespace Ast
         }
         // Print spacing, before body
         std::cout << std::endl;
-        // Print body (if any)
-        maybe_if(info.method_body, [](body method_body)
-        {
-            // Print spacing, before body
-            std::cout << std::endl;
-            // Print body opening brace
-            std::cout << "{" << std::endl;
-            // Print statements one at a time
-            unpack_list(method_body, pretty_print);
-            // Print body closing brace
-            std::cout << "}" << std::endl;
-        }).otherwise([]()
-        {
-            std::cout << ";";
-        });
+        // Print body
+        // Print spacing, before body
+        std::cout << std::endl;
+        // Print body opening brace
+        std::cout << "{" << std::endl;
+        // Print statements one at a time
+        unpack_list(info.constructor_body, pretty_print);
+        // Print body closing brace
+        std::cout << "}" << std::endl;
         // Newline for less messy'ness
         std::cout << std::endl;
     }
