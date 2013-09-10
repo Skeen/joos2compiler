@@ -164,12 +164,12 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_expression_named*, build_named_typeexp_, build_named_typeexp, 1)
 
-    Ast::type_expression_tarray* build_array_typeexp(Ast::type_expression* typeexp, std::vector<bool> num_brackets)
+    Ast::type_expression_tarray* build_array_typeexp(Ast::type_expression* typeexp, unsigned int num_brackets)
     {
         // Create the inner-most array
         Ast::type_expression_tarray* value = new Ast::type_expression_tarray(typeexp);
         // Start wrapping it, one time for each number of brackets
-        for(bool b : num_brackets)
+        for(unsigned int x=0; x<num_brackets; x++)
         {
             value = new Ast::type_expression_tarray(value);
         }
@@ -178,7 +178,7 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_expression_tarray*, build_array_typeexp_, build_array_typeexp, 2)
 
-    Ast::declaration_field* build_field_declaration(Ast::access* access_type, boost::fusion::vector2<boost::optional<boost::iterator_range<std::string::iterator>>, boost::optional<boost::iterator_range<std::string::iterator>>> is_static_is_final, Ast::type_expression* type, Ast::identifier name, Maybe<const Ast::expression*> optional_variable_intializer)
+    Ast::declaration_field* build_field_declaration(Ast::access* access_type, boost::fusion::vector2<bool,bool> is_static_is_final, Ast::type_expression* type, Ast::identifier name, Maybe<const Ast::expression*> optional_variable_intializer)
     {
         // Read out static, has type boost::optional<*>, which is implicitly casted to bool
         bool is_static = boost::fusion::at_c<0>(is_static_is_final);
@@ -204,7 +204,7 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<const Ast::expression*>, build_optional_expression_, build_optional_expression, 1)
 
-    Ast::declaration_method* build_method_declaration(Ast::access* access_type, boost::fusion::vector3<boost::optional<boost::iterator_range<std::string::iterator>>, boost::optional<boost::iterator_range<std::string::iterator>>, boost::optional<boost::iterator_range<std::string::iterator>>> is_abstract_is_static_is_final, Ast::type_expression* type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Maybe<Ast::body> body)
+    Ast::declaration_method* build_method_declaration(Ast::access* access_type, boost::fusion::vector3<bool,bool,bool> is_abstract_is_static_is_final, Ast::type_expression* type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Maybe<Ast::body> body)
     {
         // Read out abstract, has type boost::optional<*>, which is implicitly casted to bool
         bool is_abstract = boost::fusion::at_c<0>(is_abstract_is_static_is_final);
@@ -233,10 +233,8 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<Ast::body>, build_optional_method_body_, build_optional_method_body, 1)
 
-    Ast::declaration_method* build_implicit_method_declaration(boost::optional<boost::iterator_range<std::string::iterator>> abstract_option, Ast::type_expression* type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Maybe<Ast::body> body)
+    Ast::declaration_method* build_implicit_method_declaration(bool is_abstract, Ast::type_expression* type, Ast::identifier name, std::list<Ast::formal_parameter> params, std::list<const Ast::namedtype*> throws, Maybe<Ast::body> body)
     {
-        // Read out abstract, has type boost::optional<*>, which is implicitly casted to bool
-        bool is_abstract = abstract_option;
         // Create the method declaration
         Ast::method_declaration method_decl = Ast::method_declaration(new Ast::access_public, false, false, is_abstract, type, name, params, throws, body);
         // And use that to create the declaration method
@@ -483,7 +481,7 @@ namespace Parser
                                              | member_decl [ qi::_val = qi::_1 ]
                                              ;
 
-                field_declaration = (access >> (qi::token(STATIC) ^ qi::token(FINAL)) >> typeexp >> tok.identifier >> optional_variable_intializer >> qi::raw_token(SEMI_COLON))
+                field_declaration = (access >> static_final >> typeexp >> tok.identifier >> optional_variable_intializer >> qi::raw_token(SEMI_COLON))
                                      [ qi::_val = build_field_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5) ]
                                   ;
 
@@ -491,7 +489,22 @@ namespace Parser
                                      [ qi::_val = build_optional_expression_(qi::_1) ]
                                     ;
 
-                method_declaration = (access >> (qi::token(ABSTRACT) ^ qi::token(STATIC) ^ qi::token(FINAL)) >> typeexp >> tok.identifier >> method_parameters >> throws_clause >> optional_method_body)
+                abstract_static_final = (
+                                         (qi::eps) // Parse nothing is possible, and valid
+                                       ^ (qi::raw_token(ABSTRACT) >> qi::attr(true))
+                                       ^ (qi::raw_token(STATIC)   >> qi::attr(true))
+                                       ^ (qi::raw_token(FINAL)    >> qi::attr(true))
+                                        )
+                                      ;
+                
+                static_final = (
+                                         (qi::eps) // Parse nothing is possible, and valid
+                                       ^ (qi::raw_token(STATIC)   >> qi::attr(true))
+                                       ^ (qi::raw_token(FINAL)    >> qi::attr(true))
+                                        )
+                                      ;
+
+                method_declaration = (access >> abstract_static_final >> typeexp >> tok.identifier >> method_parameters >> throws_clause >> optional_method_body)
                                      [ qi::_val = build_method_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5, qi::_6, qi::_7) ]
                                     ;
 
@@ -509,7 +522,7 @@ namespace Parser
 
                 method_body = block [ qi::_val = qi::_1 ] ;
 
-                implicit_method_declaration = (-(qi::token(ABSTRACT)) >> typeexp >> tok.identifier >> method_parameters >> throws_clause >> optional_method_body)
+                implicit_method_declaration = (qi::matches[qi::raw_token(ABSTRACT)] >> typeexp >> tok.identifier >> method_parameters >> throws_clause >> optional_method_body)
                                         [ qi::_val = build_implicit_method_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5, qi::_6) ]
                                        ; 
 
@@ -707,13 +720,14 @@ namespace Parser
 
                 named_typeexp = name [ qi::_val = build_named_typeexp_(qi::_1) ];
 
-                empty_brackets = (qi::token(LEFT_BRACKET) >> qi::token(RIGHT_BRACKET))
-                                    [ qi::_val = true ]
+                empty_brackets = (qi::raw_token(LEFT_BRACKET) >> qi::raw_token(RIGHT_BRACKET))
                                ;
 
-                array_typeexp = (primitive_typeexp >> +(empty_brackets))
+                n_empty_brackets = qi::eps [ qi::_val = 0 ] >> +empty_brackets [ ++qi::_val ];
+
+                array_typeexp = (primitive_typeexp >> n_empty_brackets)
                                   [ qi::_val = build_array_typeexp_(qi::_1, qi::_2) ]
-                              | (named_typeexp >> +(empty_brackets))
+                              | (named_typeexp >> n_empty_brackets)
                                   [ qi::_val = build_array_typeexp_(qi::_1, qi::_2) ]
                               ;
                 
@@ -748,6 +762,8 @@ namespace Parser
         qi::rule<Iterator, Ast::declaration_field*()> field_declaration;
         qi::rule<Iterator, Maybe<const Ast::expression*>()> optional_variable_intializer;
         qi::rule<Iterator, Ast::declaration_method*()> method_declaration;
+        qi::rule<Iterator, boost::fusion::vector<bool, bool, bool>()> abstract_static_final;
+        qi::rule<Iterator, boost::fusion::vector<bool, bool>()> static_final;
         qi::rule<Iterator, Maybe<Ast::body>()> optional_method_body;
         qi::rule<Iterator, Ast::body()> method_body;
         qi::rule<Iterator, Ast::declaration_constructor*()> constructor_declaration;
@@ -797,9 +813,8 @@ namespace Parser
         qi::rule<Iterator, Ast::type_expression_base*()> primitive_typeexp;
         qi::rule<Iterator, Ast::type_expression_named*()> named_typeexp;
         qi::rule<Iterator, Ast::type_expression_tarray*()> array_typeexp;
-        // TODO: Shouldn't return a bool(), but rather an int, indicating the number
-        // of matches of the rule
-        qi::rule<Iterator, bool()> empty_brackets;
+        qi::rule<Iterator, void()> empty_brackets;
+        qi::rule<Iterator, unsigned int()> n_empty_brackets;
         qi::rule<Iterator, Ast::access*()> access;
         qi::rule<Iterator, Ast::name*()> name;
     };
