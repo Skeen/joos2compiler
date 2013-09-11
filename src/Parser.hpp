@@ -552,7 +552,7 @@ namespace Parser
                                            [ qi::_val = qi::_1 ]
                                          ;
 
-                local_variable_declaration_statement = (typeexp >> tok.identifier >> optional_variable_intializer)
+                local_variable_declaration_statement = (typeexp >> tok.identifier >> optional_variable_intializer >> qi::raw_token(SEMI_COLON))
                         [ qi::_val = build_local_variable_declaration_(qi::_1, qi::_2, qi::_3) ]
                         ;
 
@@ -590,7 +590,7 @@ namespace Parser
                                         [ qi::_val = build_if_then_statement_(qi::_1, qi::_2) ]
                                   ;
                                         
-                if_then_else_statement = (qi::raw_token(IF) >> qi::raw_token(LEFT_PARENTHESE) >> expression >> qi::raw_token(RIGHT_PARENTHESE) >> statement >> qi::raw_token(ELSE) >> statement)
+                if_then_else_statement = (qi::raw_token(IF) >> qi::raw_token(LEFT_PARENTHESE) >> expression >> qi::raw_token(RIGHT_PARENTHESE) >> statement_no_short_if >> qi::raw_token(ELSE) >> statement)
                                         [ qi::_val = build_if_then_else_statement_(qi::_1, qi::_2, qi::_3) ]
                                        ;
 
@@ -662,6 +662,29 @@ namespace Parser
                                     [ qi::_val = build_argument_list_(qi::_1) ]
                               ;
 
+                statement_no_short_if = (statement_without_trailing_substatement)
+                                        [ qi::_val = qi::_1 ]
+                                      | (throw_statement)
+                                        [ qi::_val = qi::_1 ]
+                                      | (if_then_else_statement_no_short_if)
+                                        [ qi::_val = qi::_1 ]
+                                      | (while_statement_no_short_if)
+                                        [ qi::_val = qi::_1 ]
+                                      | (for_statement_no_short_if)
+                                        [ qi::_val = qi::_1 ]
+                                      ;
+
+                if_then_else_statement_no_short_if = (qi::raw_token(IF) >> qi::raw_token(LEFT_PARENTHESE) >> expression >> qi::raw_token(RIGHT_PARENTHESE) >> statement_no_short_if >> qi::raw_token(ELSE) >> statement_no_short_if)
+                                        [ qi::_val = build_if_then_else_statement_(qi::_1, qi::_2, qi::_3) ]
+                                       ;
+
+                while_statement_no_short_if = (qi::raw_token(WHILE) >> qi::raw_token(LEFT_PARENTHESE) >> expression >> qi::raw_token(RIGHT_PARENTHESE) >> statement_no_short_if)
+                                        [ qi::_val = build_while_statement_(qi::_1, qi::_2) ]
+                                ;
+
+                for_statement_no_short_if = (qi::raw_token(FOR) >> qi::raw_token(LEFT_PARENTHESE) >> for_statement_init >> for_statement_condition >> for_statement_update >> qi::raw_token(RIGHT_PARENTHESE) >> statement_no_short_if)
+                                        [ qi::_val = build_for_statement_(qi::_1, qi::_2, qi::_3, qi::_4) ]
+                              ;
 
                 // MIDDLE
 
@@ -775,8 +798,6 @@ namespace Parser
         qi::rule<Iterator, std::list<const Ast::namedtype*>()> throws_clause;
         qi::rule<Iterator, std::list<const Ast::statement*>()> block;
         qi::rule<Iterator, Ast::statement*()> statement_or_declaration;
-        // TODO: Check the rule below, against the parser.mly file, something is
-        // wrong
         qi::rule<Iterator, Ast::statement_local_declaration*()> local_variable_declaration_statement;
         qi::rule<Iterator, Ast::statement*()> statement;
         qi::rule<Iterator, Ast::statement_super_call*()> super_call_statement;
@@ -797,8 +818,12 @@ namespace Parser
         qi::rule<Iterator, Ast::expression_parentheses*()> parentheses_expression;
         qi::rule<Iterator, Ast::expression*()> bracket_expression;
         qi::rule<Iterator, std::list<const Ast::expression*>()> argument_list;
+        qi::rule<Iterator, Ast::statement*()> statement_no_short_if;
+        qi::rule<Iterator, Ast::statement_if_then_else*()> if_then_else_statement_no_short_if;
+        qi::rule<Iterator, Ast::statement_while*()> while_statement_no_short_if;
+        qi::rule<Iterator, Ast::statement_block*()> for_statement_no_short_if;
         // Missing declaration start
-        // TODO: Check the apperently broken reachablility, in parser.mly
+        
         qi::rule<Iterator, Ast::expression*()> expression;
         qi::rule<Iterator, Ast::expression*()> statement_expression;
         // Missing declaration stop
