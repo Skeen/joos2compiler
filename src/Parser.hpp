@@ -22,6 +22,13 @@ namespace qi  = boost::spirit::qi;
 
 namespace Parser
 {
+    std::list<Maybe<const Ast::expression*>> vector_to_list(std::vector<Maybe<const Ast::expression*>> vector)
+    {
+        return std::list<Maybe<const Ast::expression*>>(vector.begin(), vector.end());
+    }
+
+    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<Maybe<const Ast::expression*>>, vector_to_list_, vector_to_list, 1)
+
     Ast::source_file build_source_file(Maybe<const Ast::package_declaration*> package_decl, std::list<const Ast::import_declaration*> imports_decl, Ast::type_declaration* type_decl)
     {
         return Ast::source_file(std::string("test"), package_decl, imports_decl, type_decl);
@@ -395,6 +402,19 @@ namespace Parser
     }
     BOOST_PHOENIX_ADAPT_FUNCTION(std::list<const Ast::expression*>, build_argument_list_, build_argument_list, 1)
 
+    Maybe<const Ast::expression*> build_bracket_expression(boost::optional<Ast::expression*> argument)
+    {
+        if(argument)
+        {
+            return Maybe<const Ast::expression*>(*argument);
+        }
+        else
+        {
+            return Maybe<const Ast::expression*>();
+        }
+    }
+    BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<const Ast::expression*>, build_bracket_expression_, build_bracket_expression, 1)
+
     ///////////////////////////////////////////////////////////////////////////////
     //  Grammar definition
     ///////////////////////////////////////////////////////////////////////////////
@@ -654,8 +674,8 @@ namespace Parser
                                     [ qi::_val = phoenix::new_<Ast::expression_parentheses>(qi::_1) ]
                                        ;
 
-                bracket_expression = (qi::raw_token(LEFT_BRACKET) >> expression >> qi::raw_token(RIGHT_BRACKET))
-                                    [ qi::_val = qi::_1 ]
+                bracket_expression = (qi::raw_token(LEFT_BRACKET) >> -expression >> qi::raw_token(RIGHT_BRACKET))
+                                    [ qi::_val = build_bracket_expression_(qi::_1) ]
                             ;
 
                 argument_list = (-(expression >> *(qi::raw_token(COMMA) >> expression)))
@@ -685,6 +705,201 @@ namespace Parser
                 for_statement_no_short_if = (qi::raw_token(FOR) >> qi::raw_token(LEFT_PARENTHESE) >> for_statement_init >> for_statement_condition >> for_statement_update >> qi::raw_token(RIGHT_PARENTHESE) >> statement_no_short_if)
                                         [ qi::_val = build_for_statement_(qi::_1, qi::_2, qi::_3, qi::_4) ]
                               ;
+
+                expression = (lazy_or_expression)
+                                [ qi::_val = qi::_1 ]
+                           | (assignment)
+                                [ qi::_val = qi::_1 ]
+                           ;
+
+                assignment = (left_hand_side >> qi::raw_token(ASSIGN) >> expression)
+                                [ qi::_val = phoenix::new_<Ast::expression_assignment>(qi::_1, qi::_2) ]
+                           ;
+
+                lazy_or_expression = (lazy_and_expression)
+                                        [ qi::_val = qi::_1 ]
+                                   | (lazy_or_expression >> qi::raw_token(OR_OR) >> lazy_and_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_lazyor>(), qi::_2) ]
+                                   ;
+
+                lazy_and_expression = (inclusive_or_expression)
+                                        [ qi::_val = qi::_1 ]
+                                    | (lazy_and_expression >> qi::raw_token(AND_AND) >> inclusive_or_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_lazyand>(), qi::_2) ]
+                                    ;
+
+                inclusive_or_expression = (exclusive_or_expression)
+                                             [ qi::_val = qi::_1 ]
+                                        | (exclusive_or_expression >> qi::raw_token(OR) >> exclusive_or_expression)
+                                             [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_or>(), qi::_2) ]
+                                        ;
+
+                exclusive_or_expression = (and_expression)
+                                             [ qi::_val = qi::_1 ]
+                                        | (exclusive_or_expression >> qi::raw_token(XOR) >> and_expression)
+                                             [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_xor>(), qi::_2) ]
+                                        ;
+
+                and_expression = (equality_expression)
+                                        [ qi::_val = qi::_1 ]
+                               | (and_expression >> qi::raw_token(AND) >> equality_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_and>(), qi::_2) ]
+                               ;
+
+                equality_expression = (relational_expression)
+                                        [ qi::_val = qi::_1 ]
+                               | (equality_expression >> qi::raw_token(EQ) >> relational_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_eq>(), qi::_2) ]
+                               | (equality_expression >> qi::raw_token(NEQ) >> relational_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_ne>(), qi::_2) ]
+                               ;
+
+                instance_of_expression = (relational_or_instance_of_expression >> qi::raw_token(INSTANCEOF) >> typeexp)
+                                        [ qi::_val = phoenix::new_<Ast::expression_instance_of>(qi::_1, qi::_2) ]
+                                       ;
+
+                relational_expression = (additive_expression)
+                                        [ qi::_val = qi::_1 ]
+                               | (relational_or_instance_of_expression >> qi::raw_token(LT) >> additive_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_lt>(), qi::_2) ]
+                               | (relational_or_instance_of_expression >> qi::raw_token(GT) >> additive_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_gt>(), qi::_2) ]
+                               | (relational_or_instance_of_expression >> qi::raw_token(LTEQ) >> additive_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_le>(), qi::_2) ]
+                               | (relational_or_instance_of_expression >> qi::raw_token(GTEQ) >> additive_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_ge>(), qi::_2) ]
+                               ;
+                
+                relational_or_instance_of_expression = (relational_expression)
+                                                        [ qi::_val = qi::_1 ]
+                                                     | (instance_of_expression)
+                                                        [ qi::_val = qi::_1 ]
+                                                     ;
+
+                additive_expression = (multiplicative_expression)
+                                        [ qi::_val = qi::_1 ]
+                                    | (additive_expression >> qi::raw_token(PLUS) >> multiplicative_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_plus>(), qi::_2) ]
+                                    | (additive_expression >> qi::raw_token(MINUS) >> multiplicative_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_minus>(), qi::_2) ]
+                                    ;
+
+                multiplicative_expression = (unary_expression)
+                                        [ qi::_val = qi::_1 ]
+                                    | (multiplicative_expression >> qi::raw_token(STAR) >> unary_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_times>(), qi::_2) ]
+                                    | (multiplicative_expression >> qi::raw_token(DIVISION) >> unary_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_divide>(), qi::_2) ]
+                                    | (multiplicative_expression >> qi::raw_token(MOD) >> unary_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_binop>(qi::_1, phoenix::new_<Ast::binop_modulo>(), qi::_2) ]
+                                    ;
+
+                unary_expression = (incr_decr)
+                                        [ qi::_val = qi::_1 ]
+                                 | (qi::raw_token(MINUS) >> unary_expression)
+                                        [ qi::_val = phoenix::new_<Ast::expression_unop>(phoenix::new_<Ast::unop_negate>(), qi::_1) ]
+                                 | (unary_expression_not_minus)
+                                        [ qi::_val = qi::_1 ]
+                                 ;
+
+                incr_decr = (left_hand_side_magic >> qi::raw_token(PLUS_PLUS))
+                                [ qi::_val = phoenix::new_<Ast::expression_incdec>(qi::_1, phoenix::new_<Ast::inc_dec_op_postinc>()) ]
+                          | (left_hand_side_magic >> qi::raw_token(MINUS_MINUS))
+                                [ qi::_val = phoenix::new_<Ast::expression_incdec>(qi::_1, phoenix::new_<Ast::inc_dec_op_postdec>()) ]
+                          | (qi::raw_token(PLUS_PLUS) >> left_hand_side_magic)
+                                [ qi::_val = phoenix::new_<Ast::expression_incdec>(qi::_1, phoenix::new_<Ast::inc_dec_op_preinc>()) ]
+                          | (qi::raw_token(MINUS_MINUS) >> left_hand_side_magic)
+                                [ qi::_val = phoenix::new_<Ast::expression_incdec>(qi::_1, phoenix::new_<Ast::inc_dec_op_predec>()) ]
+                          ;
+
+                unary_expression_not_minus = (cast_expression)
+                                                [ qi::_val = qi::_1 ]
+                                           | (qi::raw_token(COMPLEMENT) >> unary_expression)
+                                                [ qi::_val = phoenix::new_<Ast::expression_unop>(phoenix::new_<Ast::unop_complement>(), qi::_1) ]
+                                           ;
+
+                cast_expression = (primary)
+                                    [ qi::_val = qi::_1 ]
+                                | (qi::raw_token(LEFT_PARENTHESE) >> array_typeexp >> qi::raw_token(RIGHT_PARENTHESE) >> unary_expression)
+                                    [ qi::_val = phoenix::new_<Ast::expression_cast>(qi::_1, qi::_2) ]
+                                | (qi::raw_token(LEFT_PARENTHESE) >> primitive_typeexp >> qi::raw_token(RIGHT_PARENTHESE) >> unary_expression)
+                                    [ qi::_val = phoenix::new_<Ast::expression_cast>(qi::_1, qi::_2) ]
+                                | (qi::raw_token(LEFT_PARENTHESE) >> expression >> qi::raw_token(RIGHT_PARENTHESE) >> unary_expression_not_minus)
+                                    [ qi::_val = phoenix::new_<Ast::expression_ambiguous_cast>(qi::_1, qi::_2) ]
+                                ;
+
+                statement_expression = (assignment)                         [ qi::_val = qi::_1 ]
+                                     | (incr_decr)                          [ qi::_val = qi::_1 ]
+                                     | (method_invocation)                  [ qi::_val = qi::_1 ]
+                                     | (class_instance_creation_expression) [ qi::_val = qi::_1 ]
+                                     ;
+
+                left_hand_side = (name)
+                                    [ qi::_val = phoenix::new_<Ast::lvalue_ambiguous_name>(qi::_1) ]
+                               | (left_hand_side_not_name)
+                                    [ qi::_val = qi::_1 ] 
+                               ;
+
+                left_hand_side_not_name = (primary_not_name >> qi::raw_token(DOT) >> tok.identifier)
+                                             [ qi::_val = phoenix::new_<Ast::lvalue_non_static_field>(qi::_1, qi::_2) ]
+                                        | (array_access_expression)
+                                             [ qi::_val = qi::_1 ]
+                                        ;
+
+                left_hand_side_magic = (name)
+                                             [ qi::_val = phoenix::new_<Ast::lvalue_ambiguous_name>(qi::_1) ]
+                                     | (primary_not_name >> qi::raw_token(DOT) >> tok.identifier)
+                                             [ qi::_val = phoenix::new_<Ast::lvalue_non_static_field>(qi::_1, qi::_2) ]
+                                     ;
+
+                primary = (primary_base)
+                            [ qi::_val = qi::_1 ]
+                        | (left_hand_side)
+                            [ qi::_val = phoenix::new_<Ast::expression_lvalue>(qi::_1) ]
+                        | (array_creation_expression)
+                            [ qi::_val = qi::_1 ]
+                        ;
+
+                primary_base = (literal)
+                                [ qi::_val = qi::_1 ]
+                             | (qi::raw_token(THIS))
+                                [ qi::_val = phoenix::new_<Ast::expression_this>() ]
+                             | (parentheses_expression)
+                                [ qi::_val = qi::_1 ]
+                             | (class_instance_creation_expression)
+                                [ qi::_val = qi::_1 ]
+                             | (method_invocation)
+                                [ qi::_val = qi::_1 ]
+                             ;
+
+                primary_not_name = (primary_base)
+                                    [ qi::_val = qi::_1 ]
+                                 | (left_hand_side_not_name)
+                                    [ qi::_val = phoenix::new_<Ast::expression_lvalue>(qi::_1) ]
+                                 ;
+                
+                class_instance_creation_expression = (qi::raw_token(NEW) >> name >> qi::raw_token(LEFT_PARENTHESE) >> argument_list >> qi::raw_token(RIGHT_PARENTHESE))
+                                    [ qi::_val = phoenix::new_<Ast::expression_new>(phoenix::new_<Ast::type_expression_named>(qi::_1), qi::_2) ]
+                                 ;
+
+                method_invocation = (primary_not_name >> qi::raw_token(DOT) >> tok.identifier >> qi::raw_token(LEFT_PARENTHESE) >> argument_list >> qi::raw_token(RIGHT_PARENTHESE))
+                                    [ qi::_val = phoenix::new_<Ast::expression_non_static_invoke>(qi::_1, qi::_2, qi::_3) ]
+                                  | (name >> qi::raw_token(DOT) >> tok.identifier >> qi::raw_token(LEFT_PARENTHESE) >> argument_list >> qi::raw_token(RIGHT_PARENTHESE))
+                                    [ qi::_val = phoenix::new_<Ast::expression_ambiguous_invoke>(qi::_1, qi::_2, qi::_3) ]
+                                  | (tok.identifier >> qi::raw_token(LEFT_PARENTHESE) >> argument_list >> qi::raw_token(RIGHT_PARENTHESE))
+                                    [ qi::_val = phoenix::new_<Ast::expression_simple_invoke>(qi::_1, qi::_2) ]
+                                  ;
+
+                array_access_expression = (name >> qi::raw_token(LEFT_BRACKET) >> expression >> qi::raw_token(RIGHT_BRACKET))
+                                    [ qi::_val = phoenix::new_<Ast::lvalue_array>(phoenix::new_<Ast::expression_lvalue>(phoenix::new_<Ast::lvalue_ambiguous_name>(qi::_1)), qi::_2) ]
+                                        | (primary_not_name >> qi::raw_token(LEFT_BRACKET) >> expression >> qi::raw_token(RIGHT_BRACKET))
+                                    [ qi::_val = phoenix::new_<Ast::lvalue_array>(qi::_1, qi::_2) ]
+                                  ;
+
+                array_creation_expression = (qi::raw_token(NEW) >> element_typeexp >> qi::raw_token(LEFT_BRACKET) >> expression >> qi::raw_token(RIGHT_BRACKET) >> *bracket_expression)
+                    [ qi::_val = phoenix::new_<Ast::expression_new_array>(qi::_1, qi::_2, vector_to_list_(qi::_3)) ]
+                                          ;
+
 
                 // MIDDLE
 
@@ -753,6 +968,12 @@ namespace Parser
                               | (named_typeexp >> n_empty_brackets)
                                   [ qi::_val = build_array_typeexp_(qi::_1, qi::_2) ]
                               ;
+
+                element_typeexp = (primitive_typeexp)
+                                      [ qi::_val = qi::_1 ]
+                                | (name)
+                                      [ qi::_val = phoenix::new_<Ast::type_expression_named>(qi::_1) ]
+                                ;
                 
                 access = (qi::raw_token(PUBLIC))
                             [ qi::_val = phoenix::new_<Ast::access_public>() ]
@@ -816,17 +1037,41 @@ namespace Parser
         qi::rule<Iterator, Ast::statement_block*()> block_statement;
         qi::rule<Iterator, Ast::statement*()> return_statement;
         qi::rule<Iterator, Ast::expression_parentheses*()> parentheses_expression;
-        qi::rule<Iterator, Ast::expression*()> bracket_expression;
+        qi::rule<Iterator, Maybe<const Ast::expression*>()> bracket_expression;
         qi::rule<Iterator, std::list<const Ast::expression*>()> argument_list;
         qi::rule<Iterator, Ast::statement*()> statement_no_short_if;
         qi::rule<Iterator, Ast::statement_if_then_else*()> if_then_else_statement_no_short_if;
         qi::rule<Iterator, Ast::statement_while*()> while_statement_no_short_if;
         qi::rule<Iterator, Ast::statement_block*()> for_statement_no_short_if;
-        // Missing declaration start
-        
+        // TODO: Prettier typing, by splitting into subrules
         qi::rule<Iterator, Ast::expression*()> expression;
+        qi::rule<Iterator, Ast::expression_assignment*()> assignment;
+        qi::rule<Iterator, Ast::expression*()> lazy_or_expression;
+        qi::rule<Iterator, Ast::expression*()> lazy_and_expression;
+        qi::rule<Iterator, Ast::expression*()> inclusive_or_expression;
+        qi::rule<Iterator, Ast::expression*()> exclusive_or_expression;
+        qi::rule<Iterator, Ast::expression*()> and_expression;
+        qi::rule<Iterator, Ast::expression*()> equality_expression;
+        qi::rule<Iterator, Ast::expression*()> instance_of_expression;
+        qi::rule<Iterator, Ast::expression*()> relational_expression;
+        qi::rule<Iterator, Ast::expression*()> relational_or_instance_of_expression;
+        qi::rule<Iterator, Ast::expression*()> additive_expression;
+        qi::rule<Iterator, Ast::expression*()> multiplicative_expression;
+        qi::rule<Iterator, Ast::expression*()> unary_expression;
+        qi::rule<Iterator, Ast::expression*()> incr_decr;
+        qi::rule<Iterator, Ast::expression*()> unary_expression_not_minus;
+        qi::rule<Iterator, Ast::expression*()> cast_expression;
         qi::rule<Iterator, Ast::expression*()> statement_expression;
-        // Missing declaration stop
+        qi::rule<Iterator, Ast::lvalue*()> left_hand_side;
+        qi::rule<Iterator, Ast::lvalue*()> left_hand_side_not_name;
+        qi::rule<Iterator, Ast::lvalue*()> left_hand_side_magic;
+        qi::rule<Iterator, Ast::expression*()> primary;
+        qi::rule<Iterator, Ast::expression*()> primary_base;
+        qi::rule<Iterator, Ast::expression*()> primary_not_name;
+        qi::rule<Iterator, Ast::expression*()> class_instance_creation_expression;
+        qi::rule<Iterator, Ast::expression*()> method_invocation;
+        qi::rule<Iterator, Ast::lvalue*()> array_access_expression;
+        qi::rule<Iterator, Ast::expression*()> array_creation_expression;
         qi::rule<Iterator, Ast::expression*()> literal;
         qi::rule<Iterator, Ast::expression_integer_constant*()> integer_literal;
         qi::rule<Iterator, Ast::expression_character_constant*()> character_literal;
@@ -838,6 +1083,7 @@ namespace Parser
         qi::rule<Iterator, Ast::type_expression_base*()> primitive_typeexp;
         qi::rule<Iterator, Ast::type_expression_named*()> named_typeexp;
         qi::rule<Iterator, Ast::type_expression_tarray*()> array_typeexp;
+        qi::rule<Iterator, Ast::type_expression*()> element_typeexp;
         qi::rule<Iterator, void()> empty_brackets;
         qi::rule<Iterator, unsigned int()> n_empty_brackets;
         qi::rule<Iterator, Ast::access*()> access;
