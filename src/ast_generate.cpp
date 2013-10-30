@@ -11,23 +11,7 @@ namespace lex = boost::spirit::lex;
 
 namespace Ast
 {
-    Ast::program generate_ast(std::list<std::string> files_contents)
-    {
-        // Prepare the output list
-        std::list<source_file> program;
-        // Process all arguments
-        for(std::string& file_contents : files_contents)
-        {
-            // Generate the source-file for each (parse each)
-            Ast::source_file f = generate_ast(file_contents);
-            // Add them to the output list
-            program.push_back(f);
-        }
-        // Return the output list
-        return program;
-    }
-    
-    Ast::source_file generate_ast(std::string file_contents)
+    Ast::source_file generate_ast(std::string/* filename*/, std::string file_contents)
     {
         // We'll instance our lexer
         Lexer::lexer lexi;
@@ -55,5 +39,23 @@ namespace Ast
             // Throw an exception corresponding to the error
             throw Error::Syntax_Error(file_contents.begin(), file_contents.end(), begin);
         }
+    }
+
+    Ast::program generate_ast(std::vector<std::pair<std::string, std::string>> files_contents)
+    {
+        // Prepare the output list
+        std::list<source_file> program;
+        // Process all arguments
+        for(const std::pair<std::string, std::string>& file : files_contents)
+        {
+            const std::string filename = std::get<0>(file);
+            const std::string file_contents = std::get<1>(file);
+            // Generate the source-file for each (parse each)
+            Ast::source_file f = generate_ast(filename, file_contents);
+            // Add them to the output list
+            program.push_back(f);
+        }
+        // Return the output list
+        return program;
     }
 }

@@ -5,6 +5,9 @@ sys.path.append('../conf/scons/')
 
 from Scons_Make_Helper import *
 
+phases = ARGUMENTS.get('phases', 0)
+print(phases)
+
 Import(['env'])
 
 # To include a new subdirectory just add to the list.
@@ -73,6 +76,6 @@ env.Depends(run_tests, compile_tests)
 env.Command(run_tests, None, test_java)
 
 evaluate_tests = 'Evaluate_Tests'
-env.jAlias('Test', evaluate_tests, "Evaluate test results")
+env.jAlias('Test', evaluate_tests, 'Evaluate test results [phases="PHASES_TO_EVALUTE"]')
 env.Depends(evaluate_tests, run_tests)
 env.Command(evaluate_tests, None, evaluate_java)
