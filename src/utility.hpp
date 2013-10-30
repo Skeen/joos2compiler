@@ -51,15 +51,19 @@ void call_if(Maybe<T> maybe, FunctionPointer<FunctionReturnType, T> function)
      });
 }
 
-// Inherit from T, and map super to T.
-template<typename T>
-struct inherit_super : T
-{
-    typedef inherit_super<T> super;
-    using T::T;
-};
+/*
+ * // Inherit from T, and map super to T.
+ * template<typename T>
+ * struct inherit_super : T 
+ * { 
+ *     typedef inherit_super super; 
+ * protected:
+ *     template<typename... A>
+ *     explicit inherit_super(A&&... args) : T(std::forward<A>(args)...) {}
+ * };
+ */
 
-template<typename T>
+template<typename T> // TODO FIXME couldn't see why invocations no longer compiler (assumed pointers?)
 std::string concat(std::list<T> input, FunctionPointer<std::string, T> string_convert_function, std::string seperator)
 {
     std::string output_string = "";

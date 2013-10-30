@@ -1,104 +1,75 @@
 #include "ast_pp.hpp"
-
 #include "ast_helper.hpp"
-
 #include "utility.hpp"
 
 // Enable declarations in case clauses, which are disabled by default
 #define XTL_CLAUSE_DECL 1
-#include "typeswitch/match.hpp"
 
 #include <iostream>
 #include <cassert>
 
+namespace {
+
+    struct pretty_print_visitor_ : boost::static_visitor<>
+    {
+        template<typename T>
+        void operator ()(T const& v) const { pretty_print(v); }
+    };
+
+    static const pretty_print_visitor_ pretty_print_visitor{};
+}
+
 namespace Ast
 {
     // Type expressions
-    void pretty_print(const type_expression* type)
+    void pretty_print(type_expression const& type)
     {
-        Match(type)
-        {
-            Case(const type_expression_base type)
-            {
-                pretty_print(type);
-                break;
-            }
-            
-            Case(const type_expression_tarray type)
-            {
-                pretty_print(type);
-                break;
-            }
-            
-            Case(const type_expression_named type)
-            {
-                pretty_print(type);
-                break;
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*[>make_visitor(
+                  [](type_expression_base const& type)   { pretty_print(type); },
+                  [](type_expression_tarray const& type) { pretty_print(type); },
+                  [](type_expression_named const& type)  { pretty_print(type); }
+                  )<]*/
+                , type);
     }
 
-    void pretty_print(const type_expression_base type)
+    void pretty_print(type_expression_base const& type)
     {
-        const base_type* base_typ = type.type;
-        std::cout << base_type_to_string(base_typ);
+        std::cout << base_type_to_string(type);
     }
 
-    void pretty_print(const type_expression_tarray type)
+    void pretty_print(type_expression_tarray const& type)
     {
         pretty_print(type.type);
         std::cout << "[]";
     }
 
-    void pretty_print(const type_expression_named type)
+    void pretty_print(type_expression_named const& type)
     {
         std::cout << name_to_string(type.type);
     }
 
     // L-Value
-    void pretty_print(const lvalue* lvalue)
+    void pretty_print(lvalue const& lvalue)
     {
-        Match(lvalue)
-        {
-            Case(const lvalue_non_static_field lvalue)
-            {
-                pretty_print(lvalue);
-                break;
-            }
-
-            Case(const lvalue_array lvalue)
-            {
-                pretty_print(lvalue);
-                break;
-            }
-
-            Case(const lvalue_array lvalue)
-            {
-                pretty_print(lvalue);
-                break;
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*make_visitor(
+                    [](lvalue_non_static_field const& lvalue) { pretty_print(lvalue); },
+                    [](lvalue_array const& lvalue) { pretty_print(lvalue); },
+                    [](lvalue_array const& lvalue) { pretty_print(lvalue); }
+                    )*/
+                , lvalue);
     }
 
-    void pretty_print(const lvalue_non_static_field lvalue)
+    void pretty_print(lvalue_non_static_field const& lvalue)
     {
         pretty_print(lvalue.exp);
         std::cout << "." << lvalue.name.identifier_string;
     }
 
-    void pretty_print(const lvalue_array lvalue)
+    void pretty_print(lvalue_array const& lvalue)
     {
         pretty_print(lvalue.array_exp);
         std::cout << "[";
@@ -106,179 +77,74 @@ namespace Ast
         std::cout << "]";
     }
 
-    void pretty_print(const lvalue_ambiguous_name lvalue)
+    void pretty_print(lvalue_ambiguous_name const& lvalue)
     {
         std::cout << name_to_string(lvalue.ambiguous);
     }
     
     // Expressions
-    void pretty_print(const expression* exp)
+    void pretty_print(expression const& exp)
     {
-        Match(exp)
-        {
-            Case(const expression_binop exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_unop exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_integer_constant exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_character_constant exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_string_constant exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_boolean_constant exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_null exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_this exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_static_invoke exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_non_static_invoke exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_simple_invoke exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_ambiguous_invoke exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_new exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_new_array exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_lvalue exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_assignment exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_incdec exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_cast exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Case(const expression_ambiguous_cast exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-            
-            Case(const expression_instance_of exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-            
-            Case(const expression_parentheses exp)
-            {
-                pretty_print(exp);
-                break;
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*make_visitor(
+                    [](expression_binop const& exp)              { pretty_print(exp); }, 
+                    [](expression_unop const& exp)               { pretty_print(exp); }, 
+                    [](expression_integer_constant const& exp)   { pretty_print(exp); }, 
+                    [](expression_character_constant const& exp) { pretty_print(exp); }, 
+                    [](expression_string_constant const& exp)    { pretty_print(exp); }, 
+                    [](expression_boolean_constant const& exp)   { pretty_print(exp); }, 
+                    [](expression_null const& exp)               { pretty_print(exp); }, 
+                    [](expression_this const& exp)               { pretty_print(exp); }, 
+                    [](expression_static_invoke const& exp)      { pretty_print(exp); }, 
+                    [](expression_non_static_invoke const& exp)  { pretty_print(exp); }, 
+                    [](expression_simple_invoke const& exp)      { pretty_print(exp); }, 
+                    [](expression_ambiguous_invoke const& exp)   { pretty_print(exp); }, 
+                    [](expression_new const& exp)                { pretty_print(exp); }, 
+                    [](expression_new_array const& exp)          { pretty_print(exp); }, 
+                    [](expression_lvalue const& exp)             { pretty_print(exp); }, 
+                    [](expression_assignment const& exp)         { pretty_print(exp); }, 
+                    [](expression_incdec const& exp)             { pretty_print(exp); }, 
+                    [](expression_cast const& exp)               { pretty_print(exp); }, 
+                    [](expression_ambiguous_cast const& exp)     { pretty_print(exp); }, 
+                    [](expression_instance_of const& exp)        { pretty_print(exp); }, 
+                    [](expression_parentheses const& exp)        { pretty_print(exp); },
+                    [](lvalue_non_static_field const& exp)       { pretty_print(exp); },
+                    [](lvalue_array const& exp)                  { pretty_print(exp); },
+                    [](lvalue_ambiguous_name const& exp)         { pretty_print(exp); }
+        )*/
+                , exp);
     }
 
-    void pretty_print(const expression_binop exp)
+    void pretty_print(expression_binop const& exp)
     {
         pretty_print(exp.operand1);
         std::cout << " " << binop_to_string(exp.operatur) << " ";
         pretty_print(exp.operand2);
     }
 
-    void pretty_print(const expression_unop exp)
+    void pretty_print(expression_unop const& exp)
     {
         std::cout << unop_to_string(exp.operatur);
         pretty_print(exp.operand);
     }
 
-    void pretty_print(const expression_integer_constant exp)
+    void pretty_print(expression_integer_constant const& exp)
     {
         std::cout << exp.value;
     }
 
-    void pretty_print(const expression_character_constant exp)
+    void pretty_print(expression_character_constant const& exp)
     {
         std::cout << exp.value;
     }
 
-    void pretty_print(const expression_string_constant exp)
+    void pretty_print(expression_string_constant const& exp)
     {
         std::cout << exp.value;
     }
 
-    void pretty_print(const expression_boolean_constant exp)
+    void pretty_print(expression_boolean_constant const& exp)
     {
         if(exp.value)
         {
@@ -290,17 +156,17 @@ namespace Ast
         }
     }
 
-    void pretty_print(const expression_null)
+    void pretty_print(expression_null const&)
     {
         std::cout << "null";
     }
 
-    void pretty_print(const expression_this)
+    void pretty_print(expression_this const&)
     {
         std::cout << "this";
     }
 
-    void pretty_print(const expression_static_invoke exp)
+    void pretty_print(expression_static_invoke const& exp)
     {
         std::cout << name_to_string(exp.type) << ".";
         std::cout << exp.method_name.identifier_string;
@@ -309,7 +175,7 @@ namespace Ast
         std::cout << ")";
     }
 
-    void pretty_print(const expression_non_static_invoke exp)
+    void pretty_print(expression_non_static_invoke const& exp)
     {
         pretty_print(exp.context);
         std::cout << ".";
@@ -319,7 +185,7 @@ namespace Ast
         std::cout << ")";
     }
 
-    void pretty_print(const expression_simple_invoke exp)
+    void pretty_print(expression_simple_invoke const& exp)
     {
         std::cout << exp.method_name.identifier_string;
         std::cout << "(";
@@ -327,7 +193,7 @@ namespace Ast
         std::cout << ")";
     }
 
-    void pretty_print(const expression_ambiguous_invoke exp)
+    void pretty_print(expression_ambiguous_invoke const& exp)
     {
         std::cout << name_to_string(exp.ambiguous) << ".";
         std::cout << exp.method_name.identifier_string;
@@ -336,7 +202,7 @@ namespace Ast
         std::cout << ")";
     }
 
-    void pretty_print(const expression_new exp)
+    void pretty_print(expression_new const& exp)
     {
         std::cout << "new ";
         pretty_print(exp.type);
@@ -345,7 +211,7 @@ namespace Ast
         std::cout << ")";
     }
 
-    void pretty_print(const expression_new_array exp)
+    void pretty_print(expression_new_array const& exp)
     {
         std::cout << "new ";
         pretty_print(exp.type);
@@ -355,59 +221,31 @@ namespace Ast
         std::cout << ")";
     }
 
-    void pretty_print(const expression_lvalue exp)
+    void pretty_print(expression_lvalue const& exp)
     {
         pretty_print(exp.variable);
     }
 
-    void pretty_print(const expression_assignment exp)
+    void pretty_print(expression_assignment const& exp)
     {
         pretty_print(exp.variable);
         std::cout << " = ";
         pretty_print(exp.value);
     }
 
-    void pretty_print(const expression_incdec exp)
+    void pretty_print(expression_incdec const& exp)
     {
-        Match(exp.operatur)
-        {
-            Case(const inc_dec_op_preinc op)
-            {
-                std::cout << "++";
-                pretty_print(exp.variable);
-                break;
-            }
-
-            Case(const inc_dec_op_predec op)
-            {
-                std::cout << "--";
-                pretty_print(exp.variable);
-                break;
-            }
-
-            Case(const inc_dec_op_postinc op)
-            {
-                pretty_print(exp.variable);
-                std::cout << "++";
-                break;
-            }
-
-            Case(const inc_dec_op_postdec op)
-            {
-                pretty_print(exp.variable);
-                std::cout << "--";
-                break;
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                make_visitor(
+                    [&exp](inc_dec_op_preinc const&)  { std::cout << "++"; pretty_print(exp.variable); }, 
+                    [&exp](inc_dec_op_predec const&)  { std::cout << "--"; pretty_print(exp.variable); }, 
+                    [&exp](inc_dec_op_postinc const&) { pretty_print(exp.variable); std::cout << "++"; }, 
+                    [&exp](inc_dec_op_postdec const&) { pretty_print(exp.variable); std::cout << "--"; }
+                    )
+                , exp.operatur);
     }
 
-    void pretty_print(const expression_cast exp)
+    void pretty_print(expression_cast const& exp)
     {
         std::cout << "(";
         pretty_print(exp.type);
@@ -416,7 +254,7 @@ namespace Ast
         pretty_print(exp.value);
     }
 
-    void pretty_print(const expression_ambiguous_cast exp)
+    void pretty_print(expression_ambiguous_cast const& exp)
     {
         std::cout << "(";
         pretty_print(exp.type);
@@ -425,14 +263,14 @@ namespace Ast
         pretty_print(exp.value);
     }
 
-    void pretty_print(const expression_instance_of exp)
+    void pretty_print(expression_instance_of const& exp)
     {
         pretty_print(exp.value);
         std::cout << " instanceof ";
         pretty_print(exp.type);
     }
 
-    void pretty_print(const expression_parentheses exp)
+    void pretty_print(expression_parentheses const& exp)
     {
         std::cout << "(";
         pretty_print(exp.inside);
@@ -440,91 +278,29 @@ namespace Ast
     }
 
     // Statements
-    void pretty_print(const statement* stm)
+    void pretty_print(statement const& stm)
     {
-        Match(stm)
-        {
-            Case(const statement_expression stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_if_then stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-
-            Case(const statement_if_then_else stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_while stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-
-            Case(const statement_empty stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_block stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_void_return stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_value_return stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_local_declaration stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_throw stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_super_call stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Case(const statement_this_call stm)
-            {
-                pretty_print(stm);
-                break;
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*make_visitor(
+                    [](statement_expression const& stm)        { pretty_print(stm); }, 
+                    [](statement_if_then const& stm)           { pretty_print(stm); }, 
+                    [](statement_if_then_else const& stm)      { pretty_print(stm); }, 
+                    [](statement_while const& stm)             { pretty_print(stm); }, 
+                    [](statement_empty const& stm)             { pretty_print(stm); }, 
+                    [](statement_block const& stm)             { pretty_print(stm); }, 
+                    [](statement_void_return const& stm)       { pretty_print(stm); }, 
+                    [](statement_value_return const& stm)      { pretty_print(stm); }, 
+                    [](statement_local_declaration const& stm) { pretty_print(stm); }, 
+                    [](statement_throw const& stm)             { pretty_print(stm); }, 
+                    [](statement_super_call const& stm)        { pretty_print(stm); }, 
+                    [](statement_this_call const& stm)         { pretty_print(stm); }
+                    )*/
+                
+                , stm);
     }
 
-    void pretty_print(const statement_expression stm)
+    void pretty_print(statement_expression const& stm)
     {
         // Print the expression
         pretty_print(stm.value);
@@ -532,7 +308,7 @@ namespace Ast
         std::cout << ";";
     }
 
-    void pretty_print(const statement_if_then stm)
+    void pretty_print(statement_if_then const& stm)
     {
         // Print the condition
         std::cout << "if( ";
@@ -544,7 +320,7 @@ namespace Ast
         pretty_print(stm.true_statement);
     }
 
-    void pretty_print(const statement_if_then_else stm)
+    void pretty_print(statement_if_then_else const& stm)
     {
         // Print the condition
         std::cout << "if( ";
@@ -560,7 +336,7 @@ namespace Ast
         pretty_print(stm.false_statement);
     }
 
-    void pretty_print(const statement_while stm)
+    void pretty_print(statement_while const& stm)
     {
         // Print the condition
         std::cout << "while( ";
@@ -572,62 +348,63 @@ namespace Ast
         pretty_print(stm.loop_statement);
     }
 
-    void pretty_print(const statement_empty)
+    void pretty_print(statement_empty const&)
     {
         // Empty statement, simply print the semicolon
         std::cout << ";";
     }
 
-    void pretty_print(const statement_block stm)
+    void pretty_print(statement_block const& stm)
     {
         // Print the block start, brace
         std::cout << "{" << std::endl;
         // Print all the statments in the body
-        unpack_list(stm.body, pretty_print);
+        for(auto& substm : stm.body) 
+	    pretty_print(substm);
         // Print the block end, brace
         std::cout << "}" << std::endl;
     }
 
-    void pretty_print(const statement_void_return)
+    void pretty_print(statement_void_return const&)
     {
         std::cout << "return;";
     }
 
-    void pretty_print(const statement_value_return stm)
+    void pretty_print(statement_value_return const& stm)
     {
         std::cout << "return ";
         pretty_print(stm.value);
         std::cout << ";";
     }
     
-    void pretty_print(const statement_local_declaration stm)
+    void pretty_print(statement_local_declaration const& stm)
     {
         pretty_print(stm.type);
         std::cout << " ";
         std::cout << stm.name.identifier_string;
-        maybe_if(stm.optional_initializer, [](const expression* exp)
-        {
+	if (stm.optional_initializer)
+	{
             std::cout << " ";
-            pretty_print(exp);
-        });
+            pretty_print(*stm.optional_initializer);
+	}
         std::cout << ";";
     }
 
-    void pretty_print(const statement_throw stm)
+    void pretty_print(statement_throw const& stm)
     {
         std::cout << "throw ";
         pretty_print(stm.throwee);
         std::cout << ";";
     }
 
-    void pretty_print(const statement_super_call)
+    void pretty_print(statement_super_call const&)
     {
         std::cout << "super(";
         // TODO: Implementation of expression list
         std::cout << ");";
     }
     
-    void pretty_print(const statement_this_call)
+    void pretty_print(statement_this_call const&)
     {
         std::cout << "this(";
         // TODO: Implementation of expression list
@@ -635,37 +412,19 @@ namespace Ast
     }
 
     // Declarations
-    void pretty_print(const declaration* decl)
+    void pretty_print(declaration const& decl)
     {
-        Match(decl)
-        {
-            Case(const declaration_field field)
-            {
-                pretty_print(field);
-                break;
-            }
-            
-            Case(const declaration_method method)
-            {
-                pretty_print(method);
-                break;
-            }
-
-            Case(const declaration_constructor constructor)
-            {
-                pretty_print(constructor);
-                break;
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*make_visitor(
+                    [](declaration_field const& field)             { pretty_print(field); }, 
+                    [](declaration_method const& method)           { pretty_print(method); }, 
+                    [](declaration_constructor const& constructor) { pretty_print(constructor); }
+                    )*/
+                , decl);
     }
 
-    void pretty_print(const declaration_field field)
+    void pretty_print(declaration_field const& field)
     {
         field_declaration info = field.decl;
         // Print our access modifier
@@ -686,17 +445,17 @@ namespace Ast
         // Print the name of the field
         std::cout << info.name.identifier_string;
         // Print the intializer if any
-        maybe_if(info.optional_initializer, [](const expression* exp)
+	if (info.optional_initializer)
         {
             std::cout << " = ";
-            pretty_print(exp);
-        });
+            pretty_print(*info.optional_initializer);
+        }
         std::cout << ";";
         // Newline for less messy'ness
         std::cout << std::endl;
     }
 
-    void pretty_print(const declaration_method method)
+    void pretty_print(declaration_method const& method)
     {
         method_declaration info = method.decl;
         // Print our access modifier
@@ -728,28 +487,31 @@ namespace Ast
         // Print throws
         if(info.throws.empty() == false)
         {
-            std::cout << " throws " << concat(info.throws, name_to_string, ", ");
+            //std::cout << " throws " << concat(info.throws, name_to_string, ", "); // TODO FIXME
         }
         // Print body (if any)
-        maybe_if(info.method_body, [](body method_body)
+	if (info.method_body)
         {
+	    body const& method_body = *info.method_body;
+
             // Print spacing, before body
             std::cout << std::endl;
             // Print body opening brace
             std::cout << "{" << std::endl;
             // Print statements one at a time
-            unpack_list(method_body, pretty_print);
+	    for(auto& substm : method_body) 
+		pretty_print(substm);
             // Print body closing brace
             std::cout << "}" << std::endl;
-        }).otherwise([]()
+        } else
         {
             std::cout << ";";
-        });
+        }
         // Newline for less messy'ness
         std::cout << std::endl;
     }
 
-    void pretty_print(const declaration_constructor constructor)
+    void pretty_print(declaration_constructor const& constructor)
     {
         constructor_declaration info = constructor.decl;
         // Print our access modifier
@@ -763,52 +525,47 @@ namespace Ast
         // Print throws
         if(info.throws.empty() == false)
         {
-            std::cout << " throws " << concat(info.throws, name_to_string, ", ");
+            //std::cout << " throws " << concat(info.throws, name_to_string, ", "); // TODO FIXME
         }
         // Print spacing, before body
         std::cout << std::endl;
-        // Print body
-        // Print spacing, before body
-        std::cout << std::endl;
-        // Print body opening brace
-        std::cout << "{" << std::endl;
-        // Print statements one at a time
-        unpack_list(info.constructor_body, pretty_print);
-        // Print body closing brace
-        std::cout << "}" << std::endl;
+        // Print body (if any)
+        if(info.method_body)
+        {
+	    body const& method_body = *info.method_body;
+            // Print spacing, before body
+            std::cout << std::endl;
+            // Print body opening brace
+            std::cout << "{" << std::endl;
+            // Print statements one at a time
+	    for(auto& substm : method_body) 
+		pretty_print(substm);
+            // Print body closing brace
+            std::cout << "}" << std::endl;
+        } else
+        {
+            std::cout << ";";
+        }
         // Newline for less messy'ness
         std::cout << std::endl;
     }
 
     // Type declarations
-    void pretty_print(const type_declaration* type_decl)
+    void pretty_print(type_declaration const& type_decl)
     {
-        Match(type_decl)
-        {
-            Case(const type_declaration_class klass)
-            {
-                pretty_print(klass);
-                break;
-            }
-
-            Case(const type_declaration_interface interface)
-            {
-                pretty_print(interface);
-                break;
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*make_visitor(
+                    [](type_declaration_class const& klass) { pretty_print(klass); },
+                    [](type_declaration_interface const& interface) { pretty_print(interface); } 
+                    )*/
+                , type_decl);
     }
 
-    void pretty_print(const type_declaration_class klass)
+    void pretty_print(type_declaration_class const& klass)
     {
         // Get the info struct
-        class_declaration info = klass.type;
+        class_declaration info = klass;
         // Always public
         std::cout << "public ";
         // Print final, if we are
@@ -829,23 +586,23 @@ namespace Ast
         {
             // Then write out the 'implements' keyword, and a comma seperated
             // list of implements 
-            std::cout << " implements ";
-            std::cout << concat(info.implements, name_to_string, ", ");
+            //std::cout << " implements " << concat(info.implements, name_to_string, ", ");  // TODO FIXME
         }
         // Newline because we like allman style
         std::cout << std::endl;
         // Start brace, and newline
         std::cout << "{" << std::endl;
         // Print all members
-        unpack_list(info.members, pretty_print);
+	for(auto& mem : info.members) 
+	    pretty_print(mem);
         // End brace, and newline
         std::cout << "}" << std::endl;
     }
 
-    void pretty_print(const type_declaration_interface interface)
+    void pretty_print(type_declaration_interface const& interface)
     {
         // Get the info struct
-        interface_declaration info = interface.type;
+        interface_declaration info = interface;
         // Always public
         std::cout << "public ";
         // Print the 'interface' keyword, and the interface name
@@ -855,71 +612,61 @@ namespace Ast
         {
             // Then write out the 'extends' keyword, and a comma seperated
             // list of extends 
-            std::cout << " extends ";
-            std::cout << concat(info.extends, name_to_string, ", ");
+            //std::cout << " extends " << concat(info.extends, name_to_string, ", "); // TODO FIXME
         }
         // Newline because we like allman style
         std::cout << std::endl;
         // Start brace, and newline
         std::cout << "{" << std::endl;
         // Print all members
-        unpack_list(info.members, pretty_print);
+	for(auto& mem : info.members) 
+	    pretty_print(mem);
         // End brace, and newline
         std::cout << "}" << std::endl;
     }
 
     // Import declarations
-    void pretty_print(const import_declaration* import)
+    void pretty_print(import_declaration const& import)
     {
-        Match(import)
-        {
-            Case(const import_declaration_on_demand import)
-            {
-                pretty_print(import);
-                break;
-            }
-            Case(const import_declaration_single import)
-            {
-                pretty_print(import);
-                break;
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+	boost::apply_visitor(
+                pretty_print_visitor
+                /*make_visitor(
+                    [](import_declaration_on_demand const& import) { pretty_print(import); },
+                    [](import_declaration_single const& import) { pretty_print(import); }
+                    )*/
+                , import);
     }
 
-    void pretty_print(const import_declaration_on_demand import)
+    void pretty_print(import_declaration_on_demand const& import)
     {
-        const name* import_name = import.import;
+        name const& import_name = import.import;
         std::cout << "import " << name_to_string(import_name) << ".*;" << std::endl;
     }
 
-    void pretty_print(const import_declaration_single import)
+    void pretty_print(import_declaration_single const& import)
     {
-        const name* import_name = import.import;
+        name const& import_name = import.import;
         std::cout << "import " << name_to_string(import_name) << "." << import.class_name.identifier_string << ";" << std::endl;
     }
 
     // Package declaration
-    void pretty_print(const package_declaration* package)
+    void pretty_print(package_declaration const& package)
     {
         std::cout << "package " << name_to_string(package) << ";" << std::endl;
     }
 
     // Source file
-    void pretty_print(source_file sf)
+    void pretty_print(source_file const& sf)
     {
         // Start marker
         std::cout << ">>>> File: " << sf.name << " Start <<<<" << std::endl;
 
         // Print package declaration if any
-        call_if(sf.package, pretty_print);
+        if(sf.package) 
+	    pretty_print(*sf.package);
         // Print imports
-        unpack_list(sf.imports, pretty_print);
+	for(auto& i : sf.imports)
+	    pretty_print(i);
         // Print the type, inside the file
         pretty_print(sf.type);
         
@@ -928,10 +675,11 @@ namespace Ast
     }
 
     // Program
-    void pretty_print(program prog)
+    void pretty_print(program const& prog)
     {
         std::cout << " *** " << "pretty printing Ast::program" << " *** " << std::endl;
         // Pretty print each source file in program
-        unpack_list(prog, pretty_print);
+	for(auto& file : prog)
+            pretty_print(file);
     }
 }

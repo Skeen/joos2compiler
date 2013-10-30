@@ -10,7 +10,17 @@ include = [
     '.'
 ]
 
+libpaths = [
+    '#/libs'
+]
+
+libraries = [
+    'boost_program_options'
+]
+
 env['CPPPATH'] = include
+tmpEnv['LIBS'] = libraries
+tmpEnv['LIBPATH'] = libpaths
 
 object_list = env.Object(source = sources)
 
@@ -24,3 +34,4 @@ run_program = 'Run_Program'
 tmpEnv.jAlias('Run', run_program, "Runs the compiler")
 tmpEnv.Command(run_program, None, "./build/src/Compiler.exe input/Body.java")
 tmpEnv.Depends(run_program, task_name)
+

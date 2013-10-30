@@ -1,0 +1,17 @@
+Keywords:	class
+Identifier:	Minimal
+Delimiters:	{
+Keywords:	public
+Keywords:	static
+Keywords:	void
+Identifier:	main
+Delimiters:	(
+Identifier:	String
+Delimiters:	[
+Delimiters:	]
+Identifier:	args
+Delimiters:	)
+Delimiters:	{
+Delimiters:	}
+Delimiters:	}
+Delimiters:	;
