@@ -1,0 +1,14 @@
+Phases:
+  L     Lexer
+  P     Parser
+  W     Weeder
+  N     Name Resolving
+  E     Environment building
+  H     Hierarchy Analysis
+  D     Disambiguation
+  T     Type Checking
+  R     Reachability
+  D     Definite Assignment
+  A     Allocation of Resources
+  C     Code Generation
+  O     Optimization

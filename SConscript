@@ -9,6 +9,11 @@ SConscript('conf/scons/Scons_Help_script.py', exports = ['env'])
 env.jHelpHead("The following targets are supported;")
 env.jHelpFoot("For additional information refer to the webpage.")
 
+# Import the helpers
+SConscript('conf/scons/helpers/Scons_GetSubDirs_script.py',   exports = ['env'])
+SConscript('conf/scons/helpers/Scons_GetRootDir_script.py',   exports = ['env'])
+SConscript('conf/scons/helpers/Scons_GetCurDir_script.py',   exports = ['env'])
+
 # Import the targets
 # SConscript('conf/scons/Scons_Doxygen_script.py', exports = ['env'])
 # SConscript('conf/scons/Scons_Clean_script.py', exports = ['env'])
@@ -16,7 +21,8 @@ env.jHelpFoot("For additional information refer to the webpage.")
 # SConscript('conf/scons/Scons_GetTools_script.py',   exports = ['env'])
 #SConscript('conf/scons/Scons_Build_Lib_script.py', exports = ['env'])
 SConscript('conf/scons/Scons_Build_Src_script.py', exports = ['env'])
-# SConscript('conf/scons/Scons_Build_Test_script.py', exports = ['env'])
+#SConscript('conf/scons/Scons_Build_Test_script.py', exports = ['env'])
+SConscript('tests/SConscript', exports = ['env'])
 
 # Set the default target (compile the kernel, make image, run it)
 env.Default('BuildCompiler')

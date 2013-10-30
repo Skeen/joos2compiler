@@ -40,3 +40,11 @@ def execute(cmd):
     '''
     proc = subprocess.Popen(cmd, shell=True)
     proc.wait()
+
+def execute_deaf(cmd):
+    '''
+    Execute system command with no output
+    '''
+    DEVNULL = open(os.devnull, 'wb')
+    proc = subprocess.Popen(cmd, shell=True, stdout=DEVNULL, stderr=DEVNULL)
+    proc.wait()

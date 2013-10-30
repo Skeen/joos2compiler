@@ -4,47 +4,25 @@
 
 // Enable declarations in case clauses, which are disabled by default
 #define XTL_CLAUSE_DECL 1
-#include "typeswitch/match.hpp"
+
+#include <boost/variant.hpp>
 
 namespace Ast
 {
-    std::list<identifier> name_to_identifier_list(name_simple navn)
+    std::list<identifier> name_to_identifier_list(name_simple    const& navn) { return { navn.name }; }
+    std::list<identifier> name_to_identifier_list(name_qualified const& navn) { return navn.name; }
+
+    std::list<identifier> name_to_identifier_list(name const& navn)
     {
-        std::list<identifier> output;
-        output.push_back(navn.name);
-        return output;
-    }
-
-    std::list<identifier> name_to_identifier_list(name_qualified navn)
-    {
-        return navn.name;
-    }
-
-    std::list<identifier> name_to_identifier_list(const name* navn)
-    {
-        Match(navn)
-        {
-            Case(const name_simple navn)
-            {
-                return name_to_identifier_list(navn);
-            }
-
-            Case(const name_qualified navn)
-            {
-                return name_to_identifier_list(navn);
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
-        return std::list<identifier>();
+        return boost::apply_visitor(make_visitor<std::list<identifier>>(
+                    [] (const name_simple& navn)    { return name_to_identifier_list(navn); },
+                    [] (const name_qualified& navn) { return name_to_identifier_list(navn); }
+                    // todo catch all?
+                    ), navn);
     }
 
     /** Convert a name to its string representation */
-    std::string name_to_string(const name* navn)
+    std::string name_to_string(const name& navn)
     {
         // Get a list of identifiers
         std::list<identifier> identifiers = name_to_identifier_list(navn);
@@ -62,232 +40,74 @@ namespace Ast
     }
 
     /* exp -> bool */
-    bool is_true_constant_throws(const expression& e)
-    {
-        const expression_boolean_constant& exp = dynamic_cast<const expression_boolean_constant&>(e);
-        return exp.value;
-    }
-
-    bool is_false_const(const expression& e)
-    {
-        try
-        {
-            return !(is_true_constant_throws(e));
-        }
-        catch(std::bad_cast bc)
-        {
-            return false;
-        }
-    }
-
-    bool is_true_const(const expression& e)
-    {
-        try
-        {
-            return is_true_constant_throws(e);
-        }
-        catch(std::bad_cast bc)
-        {
-            return false;
-        }
-    }
-
     std::string type_decl_name(const type_declaration& td)
     {
-        Match(td)
-        {
-            Case(const type_declaration_class& klass)
-            {
-                return klass.type.name.identifier_string;
-            }
-
-            Case(const type_declaration_interface& interface)
-            {
-                return interface.type.name.identifier_string;
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
-        return "";
-    }
-
-    LexerPosition type_decl_pos(const type_declaration& td)
-    {
-        return td.position;
+        return boost::apply_visitor(make_visitor<std::string>(
+            [](const type_declaration_class& klass) { return klass.name.identifier_string; },
+            [](const type_declaration_interface& interface) { return interface.name.identifier_string; }
+            ), td);
     }
 
     std::string type_decl_kind(const type_declaration& td)
     {
-        Match(td)
-        {
-            Case(const type_declaration_class& klass)
-            {
-                return "Class";
-            }
+        return boost::apply_visitor(make_visitor<std::string>(
+            [](const type_declaration_class&) { return "Class"; },
+            [](const type_declaration_interface&) { return "Interface"; }
+            ), td);
+    }
 
-            Case(const type_declaration_interface& interface)
-            {
-                return "Interface";
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
+    std::string access_to_string(const access& ass)
+    {
+        return boost::apply_visitor(make_visitor<std::string>(
+            [](const access_public) { return "public"; },
+            [](const access_protected) { return "protected"; }
+            ), ass);
+    }
+
+    std::string base_type_to_string(const type_expression_base& type)
+    {
+        return boost::apply_visitor(make_visitor<std::string>(
+            [](base_type_void    const&) { return "void";    },
+            [](base_type_byte    const&) { return "byte";    },
+            [](base_type_short   const&) { return "short";   },
+            [](base_type_int     const&) { return "int";     },
+          //[](base_type_long    const&) { return "long";    },
+            [](base_type_char    const&) { return "char";    },
+          //[](base_type_float   const&) { return "float";   },
+          //[](base_type_double  const&) { return "double";  },
+            [](base_type_boolean const&) { return "boolean"; }
+            //Otherwise() { assert(false); }
+            ), type);
         return "";
     }
 
-    std::string access_to_string(const access* ass)
+    std::string unop_to_string(const unop& uno)
     {
-        Match(ass)
-        {
-            Case(const access_public as)
-            {
-                return "public";
-            }
-
-            Case(const access_protected as)
-            {
-                return "protected";
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
-        return "";
+        return boost::apply_visitor(make_visitor<std::string>(
+            [](const unop_negate) { return "-"; },
+            [](const unop_complement) { return "~"; }
+            ), uno);
     }
 
-    std::string base_type_to_string(const base_type* type)
+    std::string binop_to_string(const binop& bino)
     {
-        Match(type)
-        {
-            Case(const base_type_void type)
-            {
-                return "void";
-            }
-
-            Case(const base_type_byte type)
-            {
-                return "byte";
-            }
-
-            Case(const base_type_short type)
-            {
-                return "short";
-            }
-
-            Case(const base_type_int type)
-            {
-                return "int";
-            }
-/*
-            Case(const base_type_long type)
-            {
-                return "long";
-            }
-*/
-            Case(const base_type_char type)
-            {
-                return "char";
-            }
-/*
-            Case(const base_type_float type)
-            {
-                return "float";
-            }
-
-            Case(const base_type_double type)
-            {
-                return "double";
-            }
-*/
-            Case(const base_type_boolean type)
-            {
-                return "boolean";
-            }
-            
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
-        return "";
-    }
-
-    std::string unop_to_string(const unop* uno)
-    {
-        Match(uno)
-        {
-            Case(const unop_negate neg)
-            {
-                return "-";
-            }
-
-            Case(const unop_complement com)
-            {
-                return "~";
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
-        return "";
-    }
-
-    std::string binop_to_string(const binop* bino)
-    {
-        Match(bino)
-        {
-            Case(const binop_plus bino)
-            {
-                return "+";
-            }
-
-            Case(const binop_minus bino)
-            {
-                return "-";
-            }
-            
-            Case(const binop_times bino)
-            {
-                return "*";
-            }
-            
-            Case(const binop_divide bino)
-            {
-                return "/";
-            }
-            
-            Case(const binop_modulo bino)
-            {
-                return "%";
-            }
-
-            Otherwise()
-            {
-                assert(false);
-            }
-        }
-        EndMatch;
-        return "";
+        return boost::apply_visitor(make_visitor<std::string>(
+            [](const binop_plus)   { return "+";  }, 
+            [](const binop_minus)  { return "-";  }, 
+            [](const binop_times)  { return "*";  }, 
+            [](const binop_divide) { return "/";  }, 
+            [](const binop_modulo) { return "%";  }, 
+            [](const binop_eq)          { return "=="; }, 
+            [](const binop_ne)          { return "!="; }, 
+            [](const binop_lt)          { return "<";  }, 
+            [](const binop_le)          { return "<="; }, 
+            [](const binop_gt)          { return ">";  }, 
+            [](const binop_ge)          { return ">="; }, 
+            [](const binop_and)         { return "&";  }, 
+            [](const binop_or)          { return "|";  }, 
+            [](const binop_xor)         { return "^";  }, 
+            [](const binop_lazyand)     { return "&&"; }, 
+            [](const binop_lazyor)      { return "||"; }
+            ), bino);
     }
 }
-
-
-
-
-
-

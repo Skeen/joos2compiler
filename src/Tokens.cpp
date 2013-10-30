@@ -25,7 +25,7 @@ std::string find_enum_type(unsigned value)
         case Identifier:
             return "Identifier";
         default:
-            assert("false");
+            assert(false);
             return "";
     }
 }

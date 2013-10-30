@@ -40,10 +40,10 @@ namespace Lexer
                 ("CARRIAGE_RETURN", "\r")
                 ("SPACE",           " ")
                 ("HORIZONTAL_TAB",  "\t")
-                ("OR_CHARACTER",    "\\|")
-                ("STAR_CHARACTER",  "\\*")
-                ("PLUS_CHARACTER",  "\\+")
-                ("ASCII_CHARACTER", "[\\000-\\255]")
+                ("OR_CHARACTER",    R"(\|)")
+                ("STAR_CHARACTER",  R"(\*)")
+                ("PLUS_CHARACTER",  R"(\+)")
+                ("ASCII_CHARACTER", R"([\000-\255])")
                 ("LATIN1_LETTER",   "[A-Z]|[a-z]") //"[A-Z]|[a-z]|\\0170|\\181|\\186|[\\192-\\214]|[\\216-\\246]|[\\248-\\255]")
                 ("JAVA_LETTER",     "{LATIN1_LETTER}|$|_")
                 ("JAVA_LETTER_OR_DIGIT", "{JAVA_LETTER}|{DIGIT}")
@@ -194,3 +194,4 @@ namespace Lexer
 }
 
 #endif //_LEXER_HPP
+

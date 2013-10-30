@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+import sys
+import filecmp
+sys.path.append('../conf/scons/')
+
+from Scons_Make_Helper import *
+
+Import(['env'])
+
+# To include a new subdirectory just add to the list.
+current_dir = env.GetCurDir([])
+subdirs = env.GetSubDirs(current_dir)
+
+compiler = "build/src/Compiler.exe"
+
+def build_java(target, source, env):
+    for directory in subdirs:
+        directory_path = current_dir + "/" + directory
+        for dir_entry in os.listdir(directory_path):
+            dir_entry_path = directory_path + "/" + dir_entry
+            if(os.path.isfile(dir_entry_path)):
+                if dir_entry.endswith('.java'):
+                    file_path = current_dir + "/" + directory + "/" + dir_entry
+                    execute_deaf(compiler + " --debug-file lexer " + file_path)
+    return None
+
+result_directory = "TEST_MAGIC"
+total_lex_tests = 0
+passed_lex_tests = 0
+
+def handle_lex(directory_path, file):
+    file1_path = directory_path + "/" + file
+    file2_path = directory_path + "/" + result_directory + "/" + file
+    return filecmp.cmp(file1_path, file2_path)
+
+def handle_parse(file):
+    return false
+
+def handle_test(directory_path, file):
+    global total_lex_tests
+    global passed_lex_tests
+    if '_lexer.log' in file:
+        total_lex_tests = total_lex_tests + 1
+        status = handle_lex(directory_path, file)
+        passed_lex_tests = passed_lex_tests + status
+
+def test_java(target, source, env):
+    for directory in subdirs:
+        directory_path = current_dir + "/" + directory
+        for dir_entry in os.listdir(directory_path):
+            dir_entry_path = directory_path + "/" + dir_entry
+            if(os.path.isfile(dir_entry_path)):
+                handle_test(directory_path, dir_entry)
+    return None
+
+def evaluate_java(target, source, env):
+    global total_lex_tests
+    global passed_lex_tests
+    print("+--------------+")
+    print("| Test Results |")
+    print("+--------------+")
+    
+    print("Lexer Tests: [" + str(passed_lex_tests) + " / " + str(total_lex_tests) + "] Passed");
+
+compile_tests = 'Compile_Tests'
+env.jAlias('BuildTests', compile_tests, "Compiles and links the all the tests using the generated compiler")
+env.Depends(compile_tests, 'BuildCompiler')
+env.Command(compile_tests, None, build_java)
+
+run_tests = 'Run_Tests'
+env.jAlias('RunTests', run_tests, "Run all tests, generating result data")
+env.Depends(run_tests, compile_tests)
+env.Command(run_tests, None, test_java)
+
+evaluate_tests = 'Evaluate_Tests'
+env.jAlias('Test', evaluate_tests, "Evaluate test results")
+env.Depends(evaluate_tests, run_tests)
+env.Command(evaluate_tests, None, evaluate_java)

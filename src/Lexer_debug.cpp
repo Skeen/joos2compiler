@@ -14,6 +14,7 @@
 
 #include <utility>      // std::pair
 #include <vector>       // std::vector
+#include <fstream>
 
 #include "Tokens.hpp"
 
@@ -24,9 +25,9 @@ struct token_collector
     typedef bool result_type;
 
     template <typename Token>
-    bool operator()(Token const& t, std::vector<std::pair<unsigned, std::string>>&) const
+    bool operator()(Token const& t, std::vector<std::pair<unsigned, std::string>>& vec) const
     {
-        std::string str = "lol";
+        std::string str = "";
         if(t.value().which() == 0)
         {
                 //std::cout << "0" << std::endl;
@@ -38,7 +39,8 @@ struct token_collector
                 str = std::string(begin, end);
 
         }
-        std::cout << find_enum_type(t) << " : " << str << std::endl;
+        //std::cout << find_enum_type(t) << " : " << str << std::endl;
+        vec.push_back(std::make_pair(static_cast<unsigned>(t), str));
         return true;
     }
 };
@@ -46,7 +48,7 @@ struct token_collector
 namespace Lexer
 {
     // lex is the lexer (token definition instance) needed to invoke the lexical analyzer
-    void debug_lexer(std::string file_contents)
+    void debug_lexer(std::string filename, std::string file_contents)
     {
         // Instance the lexer
         Lexer::lexer lex;
@@ -58,20 +60,37 @@ namespace Lexer
         Lexer::lexer_iterator_type end = file_contents.end();
 
         std::vector<std::pair<unsigned, std::string>> vec;
-        bool r = lex::tokenize(begin, end, lex,
-                boost::bind(parse, _1, boost::ref(vec)));
+
+        bool r = lex::tokenize(begin, end, lex, boost::bind(parse, _1, boost::ref(vec)));
+
+        std::string output_file_name = filename;
+        output_file_name += "_lexer.log";
+
+        std::ofstream out(output_file_name);
         // print results
-        if (r) {
-            std::cout << "tokens are:" << std::endl;
+        if (r)
+        {
             for(std::pair<unsigned, std::string> value : vec)
             {
-                std::cout << find_enum_type(std::get<0>(value)) << ":\t" << std::get<1>(value) << std::endl;
+                out << find_enum_type(std::get<0>(value)) << ":\t" << std::get<1>(value) << std::endl;
             }
         }
-        else {
+        else
+        {
             std::string rest(begin, end);
-            std::cout << "Lexical analysis failed\n" << "stopped at: \"" 
-                << rest << "\"\n";
+            out << "Lexical analysis failed\n" << "stopped at: \"" << rest << "\"" << std::endl;
+        }
+        out.close();
+    }
+    
+    void debug_lexer(std::vector<std::pair<std::string, std::string>> files_contents)
+    {
+        for(std::pair<std::string, std::string> pair : files_contents)
+        {
+            std::string filename = std::get<0>(pair);
+            std::string file_contents = std::get<1>(pair);
+
+            debug_lexer(filename, file_contents);
         }
     }
 }

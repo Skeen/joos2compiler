@@ -1,6 +1,6 @@
 # Default flags for Joos2Compiler's build, per architecture
 # C++ compiler flags
-cxx_flags = ' --std=c++11 -Os'
+cxx_flags = ' --std=c++11 -Os -g'
 
 # Warning flags (that force us to write betterish code)
 warning_flags = ' -Wfatal-errors -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
