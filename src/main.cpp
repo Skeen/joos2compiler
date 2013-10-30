@@ -100,11 +100,10 @@ int main(int argc, char* argv[])
     // Start running the compiler
     std::cout << "Applying phases:" << std::endl;
     
-    /*
     try
     {
         // Let's lex and parse the input;
-        Ast::program ast = apply_phase<Ast::program, std::list<std::string>>("lexing & parsing", Ast::generate_ast, files_contents);
+        Ast::program ast = apply_phase("lexing & parsing", Ast::generate_ast, files_contents);
         // Pretty print the ast
         Ast::pretty_print(ast);
         // Let's weed the ast
@@ -114,7 +113,6 @@ int main(int argc, char* argv[])
     {
         std::cout << e.what();
     }
-    */
 
     return 0;
 }
