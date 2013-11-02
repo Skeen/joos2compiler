@@ -8,30 +8,12 @@
 #include <iostream>
 #include <cassert>
 
-namespace {
-
-    struct pretty_print_visitor_ : boost::static_visitor<>
-    {
-        template<typename T>
-        void operator ()(T const& v) const { pretty_print(v); }
-    };
-
-    static const pretty_print_visitor_ pretty_print_visitor{};
-}
-
 namespace Ast
 {
     // Type expressions
     void pretty_print(type_expression const& type)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*[>make_visitor(
-                  [](type_expression_base const& type)   { pretty_print(type); },
-                  [](type_expression_tarray const& type) { pretty_print(type); },
-                  [](type_expression_named const& type)  { pretty_print(type); }
-                  )<]*/
-                , type);
+        ApplyForAll(type, void, pretty_print);
     }
 
     void pretty_print(type_expression_base const& type)
@@ -53,14 +35,7 @@ namespace Ast
     // L-Value
     void pretty_print(lvalue const& lvalue)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*make_visitor(
-                    [](lvalue_non_static_field const& lvalue) { pretty_print(lvalue); },
-                    [](lvalue_array const& lvalue) { pretty_print(lvalue); },
-                    [](lvalue_array const& lvalue) { pretty_print(lvalue); }
-                    )*/
-                , lvalue);
+        ApplyForAll(lvalue, void, pretty_print);
     }
 
     void pretty_print(lvalue_non_static_field const& lvalue)
@@ -85,35 +60,7 @@ namespace Ast
     // Expressions
     void pretty_print(expression const& exp)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*make_visitor(
-                    [](expression_binop const& exp)              { pretty_print(exp); }, 
-                    [](expression_unop const& exp)               { pretty_print(exp); }, 
-                    [](expression_integer_constant const& exp)   { pretty_print(exp); }, 
-                    [](expression_character_constant const& exp) { pretty_print(exp); }, 
-                    [](expression_string_constant const& exp)    { pretty_print(exp); }, 
-                    [](expression_boolean_constant const& exp)   { pretty_print(exp); }, 
-                    [](expression_null const& exp)               { pretty_print(exp); }, 
-                    [](expression_this const& exp)               { pretty_print(exp); }, 
-                    [](expression_static_invoke const& exp)      { pretty_print(exp); }, 
-                    [](expression_non_static_invoke const& exp)  { pretty_print(exp); }, 
-                    [](expression_simple_invoke const& exp)      { pretty_print(exp); }, 
-                    [](expression_ambiguous_invoke const& exp)   { pretty_print(exp); }, 
-                    [](expression_new const& exp)                { pretty_print(exp); }, 
-                    [](expression_new_array const& exp)          { pretty_print(exp); }, 
-                    [](expression_lvalue const& exp)             { pretty_print(exp); }, 
-                    [](expression_assignment const& exp)         { pretty_print(exp); }, 
-                    [](expression_incdec const& exp)             { pretty_print(exp); }, 
-                    [](expression_cast const& exp)               { pretty_print(exp); }, 
-                    [](expression_ambiguous_cast const& exp)     { pretty_print(exp); }, 
-                    [](expression_instance_of const& exp)        { pretty_print(exp); }, 
-                    [](expression_parentheses const& exp)        { pretty_print(exp); },
-                    [](lvalue_non_static_field const& exp)       { pretty_print(exp); },
-                    [](lvalue_array const& exp)                  { pretty_print(exp); },
-                    [](lvalue_ambiguous_name const& exp)         { pretty_print(exp); }
-        )*/
-                , exp);
+        ApplyForAll(exp, void, pretty_print);
     }
 
     void pretty_print(expression_binop const& exp)
@@ -235,14 +182,28 @@ namespace Ast
 
     void pretty_print(expression_incdec const& exp)
     {
-	boost::apply_visitor(
-                make_visitor(
-                    [&exp](inc_dec_op_preinc const&)  { std::cout << "++"; pretty_print(exp.variable); }, 
-                    [&exp](inc_dec_op_predec const&)  { std::cout << "--"; pretty_print(exp.variable); }, 
-                    [&exp](inc_dec_op_postinc const&) { pretty_print(exp.variable); std::cout << "++"; }, 
-                    [&exp](inc_dec_op_postdec const&) { pretty_print(exp.variable); std::cout << "--"; }
-                    )
-                , exp.operatur);
+        Match(exp.operatur, void)
+            Case(inc_dec_op_preinc const&)  
+            { 
+                std::cout << "++";
+                pretty_print(exp.variable); 
+            }
+            Case(inc_dec_op_predec const&)  
+            {
+                std::cout << "--"; 
+                pretty_print(exp.variable); 
+            } 
+            Case(inc_dec_op_postinc const&) 
+            {
+                pretty_print(exp.variable); 
+                std::cout << "++"; 
+            } 
+            Case(inc_dec_op_postdec const&) 
+            {
+                pretty_print(exp.variable); 
+                std::cout << "--"; 
+            }
+        EndMatch;
     }
 
     void pretty_print(expression_cast const& exp)
@@ -280,24 +241,7 @@ namespace Ast
     // Statements
     void pretty_print(statement const& stm)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*make_visitor(
-                    [](statement_expression const& stm)        { pretty_print(stm); }, 
-                    [](statement_if_then const& stm)           { pretty_print(stm); }, 
-                    [](statement_if_then_else const& stm)      { pretty_print(stm); }, 
-                    [](statement_while const& stm)             { pretty_print(stm); }, 
-                    [](statement_empty const& stm)             { pretty_print(stm); }, 
-                    [](statement_block const& stm)             { pretty_print(stm); }, 
-                    [](statement_void_return const& stm)       { pretty_print(stm); }, 
-                    [](statement_value_return const& stm)      { pretty_print(stm); }, 
-                    [](statement_local_declaration const& stm) { pretty_print(stm); }, 
-                    [](statement_throw const& stm)             { pretty_print(stm); }, 
-                    [](statement_super_call const& stm)        { pretty_print(stm); }, 
-                    [](statement_this_call const& stm)         { pretty_print(stm); }
-                    )*/
-                
-                , stm);
+        ApplyForAll(stm, void, pretty_print);
     }
 
     void pretty_print(statement_expression const& stm)
@@ -360,7 +304,9 @@ namespace Ast
         std::cout << "{" << std::endl;
         // Print all the statments in the body
         for(auto& substm : stm.body) 
-	    pretty_print(substm);
+        {
+	        pretty_print(substm);
+        }
         // Print the block end, brace
         std::cout << "}" << std::endl;
     }
@@ -382,11 +328,11 @@ namespace Ast
         pretty_print(stm.type);
         std::cout << " ";
         std::cout << stm.name.identifier_string;
-	if (stm.optional_initializer)
-	{
+        if (stm.optional_initializer)
+        {
             std::cout << " ";
             pretty_print(*stm.optional_initializer);
-	}
+        }
         std::cout << ";";
     }
 
@@ -414,14 +360,7 @@ namespace Ast
     // Declarations
     void pretty_print(declaration const& decl)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*make_visitor(
-                    [](declaration_field const& field)             { pretty_print(field); }, 
-                    [](declaration_method const& method)           { pretty_print(method); }, 
-                    [](declaration_constructor const& constructor) { pretty_print(constructor); }
-                    )*/
-                , decl);
+        ApplyForAll(decl, void, pretty_print);
     }
 
     void pretty_print(declaration_field const& field)
@@ -445,7 +384,7 @@ namespace Ast
         // Print the name of the field
         std::cout << info.name.identifier_string;
         // Print the intializer if any
-	if (info.optional_initializer)
+        if (info.optional_initializer)
         {
             std::cout << " = ";
             pretty_print(*info.optional_initializer);
@@ -490,20 +429,23 @@ namespace Ast
             //std::cout << " throws " << concat(info.throws, name_to_string, ", "); // TODO FIXME
         }
         // Print body (if any)
-	if (info.method_body)
+        if (info.method_body)
         {
-	    body const& method_body = *info.method_body;
+            body const& method_body = *info.method_body;
 
             // Print spacing, before body
             std::cout << std::endl;
             // Print body opening brace
             std::cout << "{" << std::endl;
             // Print statements one at a time
-	    for(auto& substm : method_body) 
-		pretty_print(substm);
+            for(auto& substm : method_body) 
+            {
+                pretty_print(substm);
+            }
             // Print body closing brace
             std::cout << "}" << std::endl;
-        } else
+        }
+        else
         {
             std::cout << ";";
         }
@@ -532,17 +474,20 @@ namespace Ast
         // Print body (if any)
         if(info.method_body)
         {
-	    body const& method_body = *info.method_body;
+            body const& method_body = *info.method_body;
             // Print spacing, before body
             std::cout << std::endl;
             // Print body opening brace
             std::cout << "{" << std::endl;
             // Print statements one at a time
-	    for(auto& substm : method_body) 
-		pretty_print(substm);
+            for(auto& substm : method_body) 
+            {
+                pretty_print(substm);
+            }
             // Print body closing brace
             std::cout << "}" << std::endl;
-        } else
+        }
+        else
         {
             std::cout << ";";
         }
@@ -553,13 +498,7 @@ namespace Ast
     // Type declarations
     void pretty_print(type_declaration const& type_decl)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*make_visitor(
-                    [](type_declaration_class const& klass) { pretty_print(klass); },
-                    [](type_declaration_interface const& interface) { pretty_print(interface); } 
-                    )*/
-                , type_decl);
+        ApplyForAll(type_decl, void, pretty_print);
     }
 
     void pretty_print(type_declaration_class const& klass)
@@ -593,8 +532,10 @@ namespace Ast
         // Start brace, and newline
         std::cout << "{" << std::endl;
         // Print all members
-	for(auto& mem : info.members) 
-	    pretty_print(mem);
+        for(auto& mem : info.members) 
+        {
+	        pretty_print(mem);
+        }
         // End brace, and newline
         std::cout << "}" << std::endl;
     }
@@ -619,8 +560,10 @@ namespace Ast
         // Start brace, and newline
         std::cout << "{" << std::endl;
         // Print all members
-	for(auto& mem : info.members) 
-	    pretty_print(mem);
+        for(auto& mem : info.members) 
+        {
+	        pretty_print(mem);
+        }
         // End brace, and newline
         std::cout << "}" << std::endl;
     }
@@ -628,13 +571,7 @@ namespace Ast
     // Import declarations
     void pretty_print(import_declaration const& import)
     {
-	boost::apply_visitor(
-                pretty_print_visitor
-                /*make_visitor(
-                    [](import_declaration_on_demand const& import) { pretty_print(import); },
-                    [](import_declaration_single const& import) { pretty_print(import); }
-                    )*/
-                , import);
+        ApplyForAll(import, void, pretty_print);
     }
 
     void pretty_print(import_declaration_on_demand const& import)
@@ -665,8 +602,10 @@ namespace Ast
         if(sf.package) 
 	    pretty_print(*sf.package);
         // Print imports
-	for(auto& i : sf.imports)
-	    pretty_print(i);
+        for(auto& i : sf.imports)
+        {
+            pretty_print(i);
+        }
         // Print the type, inside the file
         pretty_print(sf.type);
         
@@ -679,7 +618,9 @@ namespace Ast
     {
         std::cout << " *** " << "pretty printing Ast::program" << " *** " << std::endl;
         // Pretty print each source file in program
-	for(auto& file : prog)
+        for(auto& file : prog)
+        {
             pretty_print(file);
+        }
     }
 }

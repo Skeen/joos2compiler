@@ -9,16 +9,29 @@
 
 namespace Ast
 {
-    std::list<identifier> name_to_identifier_list(name_simple    const& navn) { return { navn.name }; }
-    std::list<identifier> name_to_identifier_list(name_qualified const& navn) { return navn.name; }
+    std::list<identifier> name_to_identifier_list(name_simple    const& navn)
+    {
+        return { navn.name };
+    }
+
+    std::list<identifier> name_to_identifier_list(name_qualified const& navn)
+    {
+        return navn.name; 
+    }
 
     std::list<identifier> name_to_identifier_list(name const& navn)
     {
-        return boost::apply_visitor(make_visitor<std::list<identifier>>(
-                    [] (const name_simple& navn)    { return name_to_identifier_list(navn); },
-                    [] (const name_qualified& navn) { return name_to_identifier_list(navn); }
-                    // todo catch all?
-                    ), navn);
+        return 
+        Match(navn, std::list<identifier>)
+            Case(const name_simple& navn)    
+            {
+                return name_to_identifier_list(navn); 
+            }
+            Case(const name_qualified& navn)
+            {
+                return name_to_identifier_list(navn); 
+            }
+        EndMatch;
     }
 
     /** Convert a name to its string representation */
@@ -42,72 +55,179 @@ namespace Ast
     /* exp -> bool */
     std::string type_decl_name(const type_declaration& td)
     {
-        return boost::apply_visitor(make_visitor<std::string>(
-            [](const type_declaration_class& klass) { return klass.name.identifier_string; },
-            [](const type_declaration_interface& interface) { return interface.name.identifier_string; }
-            ), td);
+        return 
+        Match(td, std::string)
+            Case(const type_declaration_class& klass)
+            {
+                return klass.name.identifier_string; 
+            }
+            Case(const type_declaration_interface& interface)
+            {
+                return interface.name.identifier_string;
+            }
+        EndMatch;
     }
 
     std::string type_decl_kind(const type_declaration& td)
     {
-        return boost::apply_visitor(make_visitor<std::string>(
-            [](const type_declaration_class&) { return "Class"; },
-            [](const type_declaration_interface&) { return "Interface"; }
-            ), td);
+        return 
+        Match(td, std::string)
+            Case(const type_declaration_class&)
+            {
+                return "Class"; 
+            }
+            Case(const type_declaration_interface&) 
+            {
+                return "Interface"; 
+            }
+        EndMatch;
     }
 
     std::string access_to_string(const access& ass)
     {
-        return boost::apply_visitor(make_visitor<std::string>(
-            [](const access_public) { return "public"; },
-            [](const access_protected) { return "protected"; }
-            ), ass);
+        return 
+        Match(ass, std::string)
+            Case(const access_public) 
+            {
+                return "public"; 
+            }
+            Case(const access_protected) 
+            {
+                return "protected"; 
+            }
+        EndMatch;
     }
 
     std::string base_type_to_string(const type_expression_base& type)
     {
-        return boost::apply_visitor(make_visitor<std::string>(
-            [](base_type_void    const&) { return "void";    },
-            [](base_type_byte    const&) { return "byte";    },
-            [](base_type_short   const&) { return "short";   },
-            [](base_type_int     const&) { return "int";     },
-          //[](base_type_long    const&) { return "long";    },
-            [](base_type_char    const&) { return "char";    },
-          //[](base_type_float   const&) { return "float";   },
-          //[](base_type_double  const&) { return "double";  },
-            [](base_type_boolean const&) { return "boolean"; }
-            //Otherwise() { assert(false); }
-            ), type);
-        return "";
+        return 
+        Match(type, std::string)
+            Case(base_type_void    const&) 
+            {
+                return "void";
+            }
+            Case(base_type_byte    const&) 
+            {
+                return "byte";
+            }
+            Case(base_type_short   const&) 
+            {
+                return "short";   
+            }
+            Case(base_type_int     const&) 
+            {
+                return "int";     
+            }
+            /*
+            Case(base_type_long    const&) 
+            {
+                return "long";    
+            }
+            */
+            Case(base_type_char    const&) 
+            {
+                return "char";    
+            }
+            /*
+            Case(base_type_float   const&) 
+            {
+                return "float";   
+            }
+            Case(base_type_double  const&) 
+            {
+                return "double";  
+            }
+            */
+            Case(base_type_boolean const&) 
+            {
+                return "boolean"; 
+            }
+        EndMatch;
     }
 
     std::string unop_to_string(const unop& uno)
     {
-        return boost::apply_visitor(make_visitor<std::string>(
-            [](const unop_negate) { return "-"; },
-            [](const unop_complement) { return "~"; }
-            ), uno);
+        return 
+        Match(uno, std::string)
+            Case(const unop_negate) 
+            {
+                return "-"; 
+            }
+            Case(const unop_complement) 
+            { 
+                return "~"; 
+            }
+        EndMatch;
     }
 
     std::string binop_to_string(const binop& bino)
     {
-        return boost::apply_visitor(make_visitor<std::string>(
-            [](const binop_plus)   { return "+";  }, 
-            [](const binop_minus)  { return "-";  }, 
-            [](const binop_times)  { return "*";  }, 
-            [](const binop_divide) { return "/";  }, 
-            [](const binop_modulo) { return "%";  }, 
-            [](const binop_eq)          { return "=="; }, 
-            [](const binop_ne)          { return "!="; }, 
-            [](const binop_lt)          { return "<";  }, 
-            [](const binop_le)          { return "<="; }, 
-            [](const binop_gt)          { return ">";  }, 
-            [](const binop_ge)          { return ">="; }, 
-            [](const binop_and)         { return "&";  }, 
-            [](const binop_or)          { return "|";  }, 
-            [](const binop_xor)         { return "^";  }, 
-            [](const binop_lazyand)     { return "&&"; }, 
-            [](const binop_lazyor)      { return "||"; }
-            ), bino);
+        return 
+        Match(bino, std::string)
+            Case(const binop_plus)   
+            { 
+                return "+";  
+            } 
+            Case(const binop_minus)  
+            {
+                return "-";  
+            } 
+            Case(const binop_times)  
+            {
+                return "*";  
+            } 
+            Case(const binop_divide) 
+            {
+                return "/";  
+            } 
+            Case(const binop_modulo) 
+            {
+                return "%";  
+            } 
+            Case(const binop_eq)          
+            {
+                return "=="; 
+            } 
+            Case(const binop_ne)          
+            {
+                return "!="; 
+            } 
+            Case(const binop_lt)          
+            {
+                return "<";  
+            } 
+            Case(const binop_le)          
+            {
+                return "<="; 
+            } 
+            Case(const binop_gt)          
+            {
+                return ">";  
+            } 
+            Case(const binop_ge)          
+            {
+                return ">="; 
+            } 
+            Case(const binop_and)         
+            {
+                return "&";  
+            } 
+            Case(const binop_or)          
+            {
+                return "|";  
+            } 
+            Case(const binop_xor)         
+            {
+                return "^";  
+            } 
+            Case(const binop_lazyand)     
+            {
+                return "&&"; 
+            } 
+            Case(const binop_lazyor)      
+            {
+                return "||";
+            }
+        EndMatch;
     }
 }

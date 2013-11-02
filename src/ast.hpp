@@ -1,21 +1,16 @@
 #ifndef _COMPILER_AST_HPP
 #define _COMPILER_AST_HPP
 
-#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-#define BOOST_MPL_LIMIT_LIST_SIZE 30
-#define BOOST_MPL_LIMIT_VECTOR_SIZE 30
-
 #include "Lexer_Position.hpp"
 #include "utility.hpp"
 
 #include <boost/fusion/adapted/struct.hpp>
-#include <boost/variant.hpp>
-#include <boost/optional.hpp>
-template <typename T> using Maybe = boost::optional<T>;
 
 #include <string>
 #include <list>
 #include <utility>
+
+#include "Match/algebraic_datatype.hpp"
 
 /************************************************************************/
 /** AST type produced by the parser                                     */
@@ -31,7 +26,8 @@ namespace Ast
         std::string identifier_string;
     };
 
-    struct name_simple {
+    struct name_simple final
+    {
         identifier name;
     };
 
@@ -40,11 +36,14 @@ namespace Ast
         std::list<identifier> name;
     };
 
-    using name      = boost::variant<name_simple, name_qualified>;
+    using name      = algebraic_datatype<name_simple, name_qualified>;
     using namedtype = name;
 
     /* *************** Types *************** */
-    template <typename Tag> struct base_type_generator { };
+    template<typename Tag>
+    struct base_type_generator
+    {
+    };
 
     using base_type_void     = base_type_generator<struct void_tag>;
     using base_type_byte     = base_type_generator<struct byte_tag>;
@@ -56,7 +55,7 @@ namespace Ast
     //using base_type_double = base_type_generator<struct double_tag>;
     using base_type_boolean  = base_type_generator<struct boolean_tag>;
 
-    using type_expression_base = boost::variant<
+    using type_expression_base = algebraic_datatype<
         base_type_void,
         base_type_byte,
         base_type_short,
@@ -77,8 +76,10 @@ namespace Ast
         namedtype type;
     };
 
-    using type_expression = boost::variant<
-        type_expression_base, type_expression_named, boost::recursive_wrapper<type_expression_tarray> >;
+    using type_expression = algebraic_datatype<
+        type_expression_base,
+        type_expression_named,
+        algebraic_recursive<type_expression_tarray>>;
 
     struct type_expression_tarray final
     {
@@ -87,11 +88,12 @@ namespace Ast
     
     /* *************** Operators *************** */
     // Binary operators
-    template <typename Tag> struct binop_generator
+    template<typename Tag>
+    struct binop_generator
     {
     };
     // Arithmetic operators
-    using binop_plus    = binop_generator<struct tag_binop_plus >;
+    using binop_plus    = binop_generator<struct tag_binop_plus>;
     using binop_minus   = binop_generator<struct tag_binop_minus>;
     using binop_times   = binop_generator<struct tag_binop_times>;
     using binop_divide  = binop_generator<struct tag_binop_divide>;
@@ -110,7 +112,8 @@ namespace Ast
     using binop_lazyand = binop_generator<struct tag_binop_lazyand>;
     using binop_lazyor  = binop_generator<struct tag_binop_lazyor>;
 
-    using binop = boost::variant<
+    using binop = algebraic_datatype<
+        // Arithmetic operators
         binop_plus, binop_minus, binop_times, binop_divide, binop_modulo,
         // Comparison operators
         binop_eq, binop_ne, binop_lt, binop_le, binop_gt, binop_ge, binop_and, binop_or,
@@ -118,20 +121,28 @@ namespace Ast
         binop_xor, binop_lazyand, binop_lazyor>;
 
     // Unary operators
-    template <typename Tag> struct unop_generator { };
+    template<typename Tag>
+    struct unop_generator
+    {
+    };
     using unop_negate     = unop_generator<struct tag_unop_negate>;
     using unop_complement = unop_generator<struct tag_unop_complement>;
 
-    using unop = boost::variant<unop_negate, unop_complement>;
+    using unop = algebraic_datatype<
+        unop_negate,
+        unop_complement>;
 
     // Increment/Decrement operators
-    template <typename Tag> struct inc_dec_op_generator { };
+    template<typename Tag>
+    struct inc_dec_op_generator
+    {
+    };
     using inc_dec_op_preinc  = inc_dec_op_generator<struct tag_inc_dec_op_preinc>;
     using inc_dec_op_predec  = inc_dec_op_generator<struct tag_inc_dec_op_predec>;
     using inc_dec_op_postinc = inc_dec_op_generator<struct tag_inc_dec_op_postinc>;
     using inc_dec_op_postdec = inc_dec_op_generator<struct tag_inc_dec_op_postdec>;
 
-    using inc_dec_op = boost::variant<
+    using inc_dec_op = algebraic_datatype<
         inc_dec_op_preinc,
         inc_dec_op_predec,
         inc_dec_op_postinc,
@@ -148,9 +159,9 @@ namespace Ast
         name ambiguous;
     };
 
-    using lvalue = boost::variant<
-        boost::recursive_wrapper<lvalue_non_static_field>,
-        boost::recursive_wrapper<lvalue_array>>;
+    using lvalue = algebraic_datatype<
+        algebraic_recursive<lvalue_non_static_field>,
+        algebraic_recursive<lvalue_array>>;
 
     // Expressions
     struct expression_integer_constant final
@@ -181,7 +192,6 @@ namespace Ast
     {
     };
 
-
     struct expression_ambiguous_cast;
     struct expression_ambiguous_invoke;
     struct expression_assignment;
@@ -203,39 +213,38 @@ namespace Ast
     struct expression_this;
     struct expression_unop;
 
-
-    using expression = boost::variant<
+    using expression = algebraic_datatype<
         expression_integer_constant,
         expression_string_constant,
         expression_boolean_constant,
         expression_null,
         expression_this,
         lvalue_ambiguous_name,
-
-        boost::recursive_wrapper<expression_binop>,
-        boost::recursive_wrapper<expression_unop>,
-        boost::recursive_wrapper<expression_static_invoke>,
-        boost::recursive_wrapper<expression_non_static_invoke>,
-        boost::recursive_wrapper<expression_simple_invoke>,
-        boost::recursive_wrapper<expression_ambiguous_invoke>,
-        boost::recursive_wrapper<expression_instance_of>,
-        boost::recursive_wrapper<expression_parentheses>,
-        boost::recursive_wrapper<lvalue_non_static_field>,
-        boost::recursive_wrapper<lvalue_array>,
-        boost::recursive_wrapper<expression_binop>,
-        boost::recursive_wrapper<expression_unop>,
-        boost::recursive_wrapper<expression_static_invoke>,
-        boost::recursive_wrapper<expression_non_static_invoke>,
-        boost::recursive_wrapper<expression_simple_invoke>,
-        boost::recursive_wrapper<expression_ambiguous_invoke>,
-        boost::recursive_wrapper<expression_new>,
-        boost::recursive_wrapper<expression_new_array>,
-        boost::recursive_wrapper<expression_lvalue>,
-        boost::recursive_wrapper<expression_assignment>,
-        boost::recursive_wrapper<expression_incdec>,
-        boost::recursive_wrapper<expression_cast>,
-        boost::recursive_wrapper<expression_ambiguous_cast>,
-        boost::recursive_wrapper<expression_instance_of>
+        // Recursive members
+        algebraic_recursive<expression_binop>,
+        algebraic_recursive<expression_unop>,
+        algebraic_recursive<expression_static_invoke>,
+        algebraic_recursive<expression_non_static_invoke>,
+        algebraic_recursive<expression_simple_invoke>,
+        algebraic_recursive<expression_ambiguous_invoke>,
+        algebraic_recursive<expression_instance_of>,
+        algebraic_recursive<expression_parentheses>,
+        algebraic_recursive<lvalue_non_static_field>,
+        algebraic_recursive<lvalue_array>,
+        algebraic_recursive<expression_binop>,
+        algebraic_recursive<expression_unop>,
+        algebraic_recursive<expression_static_invoke>,
+        algebraic_recursive<expression_non_static_invoke>,
+        algebraic_recursive<expression_simple_invoke>,
+        algebraic_recursive<expression_ambiguous_invoke>,
+        algebraic_recursive<expression_new>,
+        algebraic_recursive<expression_new_array>,
+        algebraic_recursive<expression_lvalue>,
+        algebraic_recursive<expression_assignment>,
+        algebraic_recursive<expression_incdec>,
+        algebraic_recursive<expression_cast>,
+        algebraic_recursive<expression_ambiguous_cast>,
+        algebraic_recursive<expression_instance_of>
         >;
 
     struct lvalue_non_static_field final
@@ -391,7 +400,7 @@ namespace Ast
     struct statement_while;
     struct statement_block;
 
-    using statement = boost::variant<
+    using statement = algebraic_datatype<
         statement_expression,
         statement_empty,
         statement_void_return,
@@ -400,15 +409,14 @@ namespace Ast
         statement_throw,
         statement_super_call,
         statement_this_call,
-
-        boost::recursive_wrapper<statement_if_then>,
-        boost::recursive_wrapper<statement_if_then_else>,
-
-        boost::recursive_wrapper<statement_while>,
-        boost::recursive_wrapper<statement_block>
+        // Recursive below
+        algebraic_recursive<statement_if_then>,
+        algebraic_recursive<statement_if_then_else>,
+        algebraic_recursive<statement_while>,
+        algebraic_recursive<statement_block>
     >;
 
-    typedef std::list<statement> block;
+    using block = std::list<statement>;
 
     struct statement_if_then final
     {
@@ -434,10 +442,10 @@ namespace Ast
         block body;
     };
 
-    typedef block body;
+    using body = block;
 
     /* *************** Package and imports **************** */
-    typedef name package_declaration;
+    using package_declaration = name;
 
     struct import_declaration_on_demand final
     {
@@ -451,17 +459,23 @@ namespace Ast
         identifier class_name;
     };
 
-    using import_declaration = boost::variant<import_declaration_on_demand, import_declaration_single>;
+    using import_declaration = algebraic_datatype<
+        import_declaration_on_demand, 
+        import_declaration_single>;
 
     /* *************** Field and method declarations *************** */
-    template <typename T>
-    struct access_specifier final {};
+    template<typename Tag>
+    struct access_specifier final
+    {
+    };
 
     using access_public    = access_specifier<struct access_public_tag>;
     using access_protected = access_specifier<struct access_protected_tag>;
-    using access           = boost::variant<access_public, access_protected>;
+    using access           = algebraic_datatype<
+        access_public, 
+        access_protected>;
 
-    typedef std::pair<expression, identifier> formal_parameter;
+    using formal_parameter = std::pair<expression, identifier>;
 
     struct field_declaration
     {
@@ -510,7 +524,10 @@ namespace Ast
         constructor_declaration decl;
     };
 
-    using declaration = boost::variant<declaration_field, declaration_method, declaration_constructor>;
+    using declaration = algebraic_datatype<
+        declaration_field, 
+        declaration_method, 
+        declaration_constructor>;
 
     /* *************** Type declarations **************** */
     struct class_declaration
@@ -530,7 +547,9 @@ namespace Ast
         std::list<declaration> members;
     };
 
-    using type_declaration = boost::variant<class_declaration, interface_declaration>;
+    using type_declaration = algebraic_datatype<
+        class_declaration, 
+        interface_declaration>;
 
     using type_declaration_class     = class_declaration;
     using type_declaration_interface = interface_declaration;
@@ -544,7 +563,7 @@ namespace Ast
         type_declaration type;
     };
 
-    typedef std::list<source_file> program;
+    using program = std::list<source_file>;
 }
 
 BOOST_FUSION_ADAPT_STRUCT(Ast::source_file, (std::string, name)(Maybe<Ast::package_declaration>, package)

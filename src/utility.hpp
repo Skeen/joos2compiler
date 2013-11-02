@@ -56,7 +56,7 @@ void call_if(Maybe<T> maybe, FunctionPointer<FunctionReturnType, T> function)
  * template<typename T>
  * struct inherit_super : T 
  * { 
- *     typedef inherit_super super; 
+ *     using super = inherit_super; 
  * protected:
  *     template<typename... A>
  *     explicit inherit_super(A&&... args) : T(std::forward<A>(args)...) {}
