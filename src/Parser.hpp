@@ -25,7 +25,7 @@ namespace boost { namespace spirit { namespace traits {
     template </*typename Exposed, typename Transformed, typename Domain, typename Enable*/>
         struct transform_attribute<Ast::import_declaration_on_demand, Ast::name, qi::domain, void>
         {
-            typedef Ast::name type;
+            using type = Ast::name;
 
             static type pre (Ast::import_declaration_on_demand&)                 { return {}; }
             static void post(Ast::import_declaration_on_demand& val, type attr)  { val = { attr }; }

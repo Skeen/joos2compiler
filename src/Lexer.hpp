@@ -180,17 +180,17 @@ namespace Lexer
 namespace Lexer
 {
     // This is our input type (the type, used to expose the underlying input stream)
-    typedef std::string::iterator lexer_iterator_type;
+    using lexer_iterator_type = std::string::iterator;
     // This is a list of all the attributes that the lexer exposes
-    typedef boost::mpl::vector<std::string> lexer_exposed_types;
+    using lexer_exposed_types = boost::mpl::vector<std::string>;
     // This is our token type
-    typedef lex::lexertl::token<lexer_iterator_type, lexer_exposed_types, boost::mpl::false_> lexer_token_type;
+    using lexer_token_type = lex::lexertl::token<lexer_iterator_type, lexer_exposed_types, boost::mpl::false_>;
     // This is the general form type of our lexer
-    typedef lex::lexertl::actor_lexer<lexer_token_type> lexer_type;
+    using lexer_type = lex::lexertl::actor_lexer<lexer_token_type>;
     // This is our final lexer type (which can be used)
-    typedef java_tokens<lexer_type> lexer;
+    using lexer = java_tokens<lexer_type>;
     // This is the output (iterator) type of our lexer
-    typedef lexer::iterator_type lexer_iterator;
+    using lexer_iterator = lexer::iterator_type;
 }
 
 #endif //_LEXER_HPP

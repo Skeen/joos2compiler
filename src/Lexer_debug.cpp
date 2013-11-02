@@ -22,7 +22,7 @@
 
 struct token_collector
 {
-    typedef bool result_type;
+    using result_type = bool;
 
     template <typename Token>
     bool operator()(Token const& t, std::vector<std::pair<unsigned, std::string>>& vec) const
