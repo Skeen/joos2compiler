@@ -86,7 +86,7 @@ namespace Error
         return error_text.c_str();
     }
 
-    Generic_Error::~Generic_Error()
+    Generic_Error::~Generic_Error() noexcept
     {
     }
 

@@ -1,7 +1,7 @@
 Import(['env'])
 
 tmpEnv = env.Clone()
-env.Append(CXXFLAGS="-isystem include")
+env.Append(CXXFLAGS="-isystem include -isystem /home/sehe/custom/boost")
 
 sources = Glob("*.cpp")
 
@@ -9,8 +9,11 @@ include = [
     '#/src',
     '.'
 ]
-
 env['CPPPATH'] = include
+env['CC']      = 'clangcc'
+env['CXX']     = 'clang++'
+env['CC']      = '/usr/lib/gcc-snapshot/bin/gcc'
+env['CXX']     = '/usr/lib/gcc-snapshot/bin/g++'
 
 object_list = env.Object(source = sources)
 

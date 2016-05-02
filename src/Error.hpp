@@ -19,7 +19,7 @@ namespace Error
             */
         public:
             const char* what() const noexcept final override;
-            virtual ~Generic_Error();
+            virtual ~Generic_Error() noexcept;
     };
 
     struct Syntax_Error : Generic_Error

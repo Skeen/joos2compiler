@@ -1,0 +1,489 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ABSTRACT	src/Tokens.hpp	/^    ABSTRACT,$/;"	e	enum:KeywordsType
+AND	src/Tokens.hpp	/^    AND,        \/\/ "&"$/;"	e	enum:ArithmeticType
+AND_AND	src/Tokens.hpp	/^    AND_AND,    \/\/ "&&"$/;"	e	enum:AssignmentAndLogicType
+ASSIGN	src/Tokens.hpp	/^    ASSIGN,     \/\/ "="$/;"	e	enum:AssignmentAndLogicType
+Arithmetic	src/Tokens.hpp	/^    Arithmetic          = Comparison         + 0x0100,$/;"	e	enum:TypesStart
+ArithmeticType	src/Tokens.hpp	/^enum ArithmeticType$/;"	g
+Arithmetic_Start	src/Tokens.hpp	/^    Arithmetic_Start = Arithmetic,$/;"	e	enum:ArithmeticType
+AssignmentAndLogic	src/Tokens.hpp	/^    AssignmentAndLogic  = Delimiters         + 0x0100,$/;"	e	enum:TypesStart
+AssignmentAndLogicType	src/Tokens.hpp	/^enum AssignmentAndLogicType$/;"	g
+AssignmentAndLogic_Start	src/Tokens.hpp	/^    AssignmentAndLogic_Start = AssignmentAndLogic,$/;"	e	enum:AssignmentAndLogicType
+Ast	src/ast.hpp	/^namespace Ast$/;"	n
+Ast	src/ast_generate.cpp	/^namespace Ast$/;"	n	file:
+Ast	src/ast_generate.hpp	/^namespace Ast$/;"	n
+Ast	src/ast_helper.cpp	/^namespace Ast$/;"	n	file:
+Ast	src/ast_helper.hpp	/^namespace Ast$/;"	n
+Ast	src/ast_pp.cpp	/^namespace Ast$/;"	n	file:
+Ast	src/ast_pp.hpp	/^namespace Ast$/;"	n
+BOOLEAN	src/Tokens.hpp	/^    BOOLEAN,$/;"	e	enum:KeywordsType
+BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS	src/ast.hpp	4;"	d
+BOOST_MPL_LIMIT_LIST_SIZE	src/ast.hpp	5;"	d
+BOOST_MPL_LIMIT_VECTOR_SIZE	src/ast.hpp	6;"	d
+BOOST_SPIRIT_USE_PHOENIX_V3	src/Boost_Spirit_Config.hpp	4;"	d
+BREAK	src/Tokens.hpp	/^    BREAK,$/;"	e	enum:KeywordsType
+BYTE	src/Tokens.hpp	/^    BYTE,$/;"	e	enum:KeywordsType
+CASE	src/Tokens.hpp	/^    CASE,$/;"	e	enum:KeywordsType
+CATCH	src/Tokens.hpp	/^    CATCH,$/;"	e	enum:KeywordsType
+CHAR	src/Tokens.hpp	/^    CHAR,$/;"	e	enum:KeywordsType
+CHAR_LITERAL	src/Tokens.hpp	/^    CHAR_LITERAL,$/;"	e	enum:LiteralsType
+CLASS	src/Tokens.hpp	/^    CLASS,$/;"	e	enum:KeywordsType
+COMMA	src/Tokens.hpp	/^    COMMA,              \/\/ ","$/;"	e	enum:DelimitersType
+COMPLEMENT	src/Tokens.hpp	/^    COMPLEMENT, \/\/ "!"$/;"	e	enum:AssignmentAndLogicType
+CONST	src/Tokens.hpp	/^    CONST,$/;"	e	enum:KeywordsType
+CONTINUE	src/Tokens.hpp	/^    CONTINUE,$/;"	e	enum:KeywordsType
+Comments	src/Tokens.hpp	/^    Comments            = Specials           + 0x0100,$/;"	e	enum:TypesStart
+CommentsType	src/Tokens.hpp	/^enum CommentsType$/;"	g
+Comments_Start	src/Tokens.hpp	/^    Comments_Start = Comments,$/;"	e	enum:CommentsType
+Comparison	src/Tokens.hpp	/^    Comparison          = AssignmentAndLogic + 0x0100,$/;"	e	enum:TypesStart
+ComparisonType	src/Tokens.hpp	/^enum ComparisonType$/;"	g
+Comparison_Start	src/Tokens.hpp	/^    Comparison_Start = Comparison,$/;"	e	enum:ComparisonType
+DECIMAL_LITERAL	src/Tokens.hpp	/^    DECIMAL_LITERAL,$/;"	e	enum:LiteralsType
+DEFAULT	src/Tokens.hpp	/^    DEFAULT,$/;"	e	enum:KeywordsType
+DIVISION	src/Tokens.hpp	/^    DIVISION,   \/\/ "\/"$/;"	e	enum:ArithmeticType
+DO	src/Tokens.hpp	/^    DO,$/;"	e	enum:KeywordsType
+DOT	src/Tokens.hpp	/^    DOT                 \/\/ "."$/;"	e	enum:DelimitersType
+DOUBLE	src/Tokens.hpp	/^    DOUBLE,$/;"	e	enum:KeywordsType
+Delimiters	src/Tokens.hpp	/^    Delimiters          = Keywords           + 0x0100,$/;"	e	enum:TypesStart
+DelimitersType	src/Tokens.hpp	/^enum DelimitersType$/;"	g
+Delimiters_Start	src/Tokens.hpp	/^    Delimiters_Start = Delimiters,$/;"	e	enum:DelimitersType
+ELSE	src/Tokens.hpp	/^    ELSE,$/;"	e	enum:KeywordsType
+END_OF_FILE	src/Tokens.hpp	/^    END_OF_FILE,   \/\/ "\\0" \/\/ NOTE: This is explicitly added after the lexing$/;"	e	enum:SpecialsType
+EQ	src/Tokens.hpp	/^    EQ,     \/\/ "=="$/;"	e	enum:ComparisonType
+EXTENDS	src/Tokens.hpp	/^    EXTENDS,$/;"	e	enum:KeywordsType
+Error	src/Error.cpp	/^namespace Error$/;"	n	file:
+Error	src/Error.hpp	/^namespace Error$/;"	n
+FALSE_CONSTANT	src/Tokens.hpp	/^    FALSE_CONSTANT,$/;"	e	enum:KeywordsType
+FINAL	src/Tokens.hpp	/^    FINAL,$/;"	e	enum:KeywordsType
+FINALLY	src/Tokens.hpp	/^    FINALLY,$/;"	e	enum:KeywordsType
+FLOAT	src/Tokens.hpp	/^    FLOAT,$/;"	e	enum:KeywordsType
+FOR	src/Tokens.hpp	/^    FOR,$/;"	e	enum:KeywordsType
+GOTO	src/Tokens.hpp	/^    GOTO,$/;"	e	enum:KeywordsType
+GT	src/Tokens.hpp	/^    GT,     \/\/ ">"$/;"	e	enum:ComparisonType
+GTEQ	src/Tokens.hpp	/^    GTEQ,   \/\/ ">="$/;"	e	enum:ComparisonType
+Generic_Error	src/Error.cpp	/^    Generic_Error::Generic_Error(std::string error_text)$/;"	f	class:Error::Generic_Error
+Generic_Error	src/Error.cpp	/^    Generic_Error::Generic_Error(std::string error_text_init, std::string::iterator begin, std::string::iterator end, std::string::iterator issue)$/;"	f	class:Error::Generic_Error
+Generic_Error	src/Error.hpp	/^    struct Generic_Error : std::exception$/;"	s	namespace:Error
+IDENTIFIER	src/Tokens.hpp	/^    IDENTIFIER   \/\/ Pretty much, consumes everything else$/;"	e	enum:IdentifierType
+IF	src/Tokens.hpp	/^    IF,$/;"	e	enum:KeywordsType
+IMPLEMENTS	src/Tokens.hpp	/^    IMPLEMENTS,$/;"	e	enum:KeywordsType
+IMPORT	src/Tokens.hpp	/^    IMPORT,$/;"	e	enum:KeywordsType
+INSTANCEOF	src/Tokens.hpp	/^    INSTANCEOF,$/;"	e	enum:KeywordsType
+INT	src/Tokens.hpp	/^    INT,$/;"	e	enum:KeywordsType
+INTERFACE	src/Tokens.hpp	/^    INTERFACE,$/;"	e	enum:KeywordsType
+Identifier	src/Tokens.hpp	/^    Identifier          = Literals           + 0x0100$/;"	e	enum:TypesStart
+IdentifierType	src/Tokens.hpp	/^enum IdentifierType$/;"	g
+Identifier_Start	src/Tokens.hpp	/^    Identifier_Start = Identifier,$/;"	e	enum:IdentifierType
+Keywords	src/Tokens.hpp	/^    Keywords            = Comments           + 0x0100,$/;"	e	enum:TypesStart
+KeywordsType	src/Tokens.hpp	/^enum KeywordsType$/;"	g
+Keywords_Start	src/Tokens.hpp	/^    Keywords_Start = Keywords,$/;"	e	enum:KeywordsType
+LEFT_BRACE	src/Tokens.hpp	/^    LEFT_BRACE,         \/\/ "{"$/;"	e	enum:DelimitersType
+LEFT_BRACKET	src/Tokens.hpp	/^    LEFT_BRACKET,       \/\/ "["$/;"	e	enum:DelimitersType
+LEFT_PARENTHESE	src/Tokens.hpp	/^    LEFT_PARENTHESE,    \/\/ "("$/;"	e	enum:DelimitersType
+LONG	src/Tokens.hpp	/^    LONG,$/;"	e	enum:KeywordsType
+LT	src/Tokens.hpp	/^    LT,     \/\/ "<"$/;"	e	enum:ComparisonType
+LTEQ	src/Tokens.hpp	/^    LTEQ,   \/\/ "<="$/;"	e	enum:ComparisonType
+Lexer	src/Lexer.hpp	/^namespace Lexer$/;"	n
+Lexer	src/Lexer_debug.cpp	/^namespace Lexer$/;"	n	file:
+Lexer	src/Lexer_debug.hpp	/^namespace Lexer$/;"	n
+LexerPosition	src/Lexer_Position.hpp	/^typedef int LexerPosition;$/;"	t
+Literals	src/Tokens.hpp	/^    Literals            = Arithmetic         + 0x0100,$/;"	e	enum:TypesStart
+LiteralsType	src/Tokens.hpp	/^enum LiteralsType$/;"	g
+Literals_Start	src/Tokens.hpp	/^    Literals_Start = Literals,$/;"	e	enum:LiteralsType
+MINUS	src/Tokens.hpp	/^    MINUS,      \/\/ "-"$/;"	e	enum:ArithmeticType
+MINUS_MINUS	src/Tokens.hpp	/^    MINUS_MINUS \/\/ "--"$/;"	e	enum:ArithmeticType
+MOD	src/Tokens.hpp	/^    MOD,        \/\/ "%"$/;"	e	enum:ArithmeticType
+NATIVE	src/Tokens.hpp	/^    NATIVE,$/;"	e	enum:KeywordsType
+NEQ	src/Tokens.hpp	/^    NEQ     \/\/ "!="$/;"	e	enum:ComparisonType
+NEW	src/Tokens.hpp	/^    NEW,$/;"	e	enum:KeywordsType
+NULL_CONSTANT	src/Tokens.hpp	/^    NULL_CONSTANT,$/;"	e	enum:KeywordsType
+OR	src/Tokens.hpp	/^    OR,         \/\/ "|"$/;"	e	enum:ArithmeticType
+OR_OR	src/Tokens.hpp	/^    OR_OR       \/\/ "||"$/;"	e	enum:AssignmentAndLogicType
+PACKAGE	src/Tokens.hpp	/^    PACKAGE,$/;"	e	enum:KeywordsType
+PLUS	src/Tokens.hpp	/^    PLUS,       \/\/ "+"$/;"	e	enum:ArithmeticType
+PLUS_PLUS	src/Tokens.hpp	/^    PLUS_PLUS,  \/\/ "++"$/;"	e	enum:ArithmeticType
+PRIVATE	src/Tokens.hpp	/^    PRIVATE,$/;"	e	enum:KeywordsType
+PROTECTED	src/Tokens.hpp	/^    PROTECTED,$/;"	e	enum:KeywordsType
+PUBLIC	src/Tokens.hpp	/^    PUBLIC,$/;"	e	enum:KeywordsType
+Parser	src/Parser.hpp	/^namespace Parser {$/;"	n
+Parser	src/Parser.hpp	/^namespace Parser$/;"	n
+RETURN	src/Tokens.hpp	/^    RETURN,$/;"	e	enum:KeywordsType
+RIGHT_BRACE	src/Tokens.hpp	/^    RIGHT_BRACE,        \/\/ "}"$/;"	e	enum:DelimitersType
+RIGHT_BRACKET	src/Tokens.hpp	/^    RIGHT_BRACKET,      \/\/ "]"$/;"	e	enum:DelimitersType
+RIGHT_PARENTHESE	src/Tokens.hpp	/^    RIGHT_PARENTHESE,   \/\/ ")"$/;"	e	enum:DelimitersType
+SEMI_COLON	src/Tokens.hpp	/^    SEMI_COLON,         \/\/ ";"$/;"	e	enum:DelimitersType
+SHORT	src/Tokens.hpp	/^    SHORT,$/;"	e	enum:KeywordsType
+STAR	src/Tokens.hpp	/^    STAR,       \/\/ "*"$/;"	e	enum:ArithmeticType
+STATIC	src/Tokens.hpp	/^    STATIC,$/;"	e	enum:KeywordsType
+STRICTFP	src/Tokens.hpp	/^    STRICTFP,$/;"	e	enum:KeywordsType
+STRING_LITERAL	src/Tokens.hpp	/^    STRING_LITERAL$/;"	e	enum:LiteralsType
+SUPER	src/Tokens.hpp	/^    SUPER,$/;"	e	enum:KeywordsType
+SWITCH	src/Tokens.hpp	/^    SWITCH,$/;"	e	enum:KeywordsType
+SYNCHRONIZED	src/Tokens.hpp	/^    SYNCHRONIZED,$/;"	e	enum:KeywordsType
+Specials	src/Tokens.hpp	/^    Specials            = (lex::min_token_id + 0x0100) & 0xFF00,$/;"	e	enum:TypesStart
+SpecialsType	src/Tokens.hpp	/^enum SpecialsType$/;"	g
+Specials_Start	src/Tokens.hpp	/^    Specials_Start = Specials,$/;"	e	enum:SpecialsType
+Syntax_Error	src/Error.cpp	/^    Syntax_Error::Syntax_Error()$/;"	f	class:Error::Syntax_Error
+Syntax_Error	src/Error.cpp	/^    Syntax_Error::Syntax_Error(std::string::iterator raw_input_start, std::string::iterator raw_input_end, std::string::iterator begin)$/;"	f	class:Error::Syntax_Error
+Syntax_Error	src/Error.hpp	/^    struct Syntax_Error : Generic_Error$/;"	s	namespace:Error
+THIS	src/Tokens.hpp	/^    THIS,$/;"	e	enum:KeywordsType
+THROW	src/Tokens.hpp	/^    THROW,$/;"	e	enum:KeywordsType
+THROWS	src/Tokens.hpp	/^    THROWS,$/;"	e	enum:KeywordsType
+TRANSIENT	src/Tokens.hpp	/^    TRANSIENT,$/;"	e	enum:KeywordsType
+TRUE_CONSTANT	src/Tokens.hpp	/^    TRUE_CONSTANT,$/;"	e	enum:KeywordsType
+TRY	src/Tokens.hpp	/^    TRY,$/;"	e	enum:KeywordsType
+TypesStart	src/Tokens.hpp	/^enum TypesStart$/;"	g
+VOID	src/Tokens.hpp	/^    VOID,$/;"	e	enum:KeywordsType
+VOLATILE	src/Tokens.hpp	/^    VOLATILE,$/;"	e	enum:KeywordsType
+WHILE	src/Tokens.hpp	/^    WHILE,$/;"	e	enum:KeywordsType
+XOR	src/Tokens.hpp	/^    XOR,        \/\/ "^"$/;"	e	enum:ArithmeticType
+XTL_CLAUSE_DECL	src/Parser.hpp	17;"	d
+XTL_CLAUSE_DECL	src/ast_helper.cpp	6;"	d	file:
+XTL_CLAUSE_DECL	src/ast_pp.cpp	6;"	d	file:
+_AST_GENERATE_HPP	src/ast_generate.hpp	2;"	d
+_BOOST_SPIRIT_CONFIG_HPP	src/Boost_Spirit_Config.hpp	2;"	d
+_COMPILER_AST_HELPER_HPP	src/ast_helper.hpp	2;"	d
+_COMPILER_AST_HPP	src/ast.hpp	2;"	d
+_COMPILER_AST_PP_HPP	src/ast_pp.hpp	2;"	d
+_COMPILER_UTILITY_HPP	src/utility.hpp	2;"	d
+_ERROR_HPP	src/Error.hpp	2;"	d
+_LEXER_DEBUG_HPP	src/Lexer_debug.cpp	2;"	d	file:
+_LEXER_DEBUG_HPP	src/Lexer_debug.hpp	2;"	d
+_LEXER_HPP	src/Lexer.hpp	2;"	d
+_LEXER_POSITION	src/Lexer_Position.hpp	2;"	d
+_PARSER_HPP	src/Parser.hpp	2;"	d
+_TOKENS_HPP	src/Tokens.hpp	2;"	d
+_TO_STRING_HPP	src/to_string.hpp	2;"	d
+access	src/Parser.hpp	/^        qi::rule<Iterator, Ast::access()> access;$/;"	m	struct:Parser::java_grammar
+access_to_string	src/ast_helper.cpp	/^    std::string access_to_string(const access& ass)$/;"	f	namespace:Ast
+access_type	src/ast.hpp	/^        access access_type;$/;"	m	struct:Ast::constructor_declaration
+access_type	src/ast.hpp	/^        access access_type;$/;"	m	struct:Ast::field_declaration
+access_type	src/ast.hpp	/^        access access_type;$/;"	m	struct:Ast::method_declaration
+ambiguous	src/ast.hpp	/^        name                  ambiguous;$/;"	m	struct:Ast::final
+ambiguous	src/ast.hpp	/^        name ambiguous;$/;"	m	struct:Ast::final
+apply_phase	src/utility.hpp	/^FunctionReturnType apply_phase(std::string phase_name, FunctionPointer<FunctionReturnType, Parameters...> phase, Parameters... arguments)$/;"	f
+arguments	src/ast.hpp	/^        std::list<Maybe<expression>> arguments;$/;"	m	struct:Ast::final
+arguments	src/ast.hpp	/^        std::list<expression> arguments;$/;"	m	struct:Ast::final
+array_exp	src/ast.hpp	/^        expression array_exp;$/;"	m	struct:Ast::final
+array_typeexp	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_expression_tarray()> array_typeexp;$/;"	m	struct:Parser::java_grammar
+base_type_generator	src/ast.hpp	/^    template <typename Tag> struct base_type_generator { };$/;"	s	namespace:Ast
+base_type_to_string	src/ast_helper.cpp	/^    std::string base_type_to_string(const type_expression_base& type)$/;"	f	namespace:Ast
+binop_generator	src/ast.hpp	/^    template <typename Tag> struct binop_generator$/;"	s	namespace:Ast
+binop_to_string	src/ast_helper.cpp	/^    std::string binop_to_string(const binop& bino)$/;"	f	namespace:Ast
+block	src/ast.hpp	/^    typedef std::list<statement> block;$/;"	t	namespace:Ast
+block_comment	src/Lexer.hpp	/^        lex::token_def<std::string> block_comment;$/;"	m	struct:java_tokens
+body	src/ast.hpp	/^        block body;$/;"	m	struct:Ast::final
+body	src/ast.hpp	/^    typedef block body;$/;"	t	namespace:Ast
+boost	src/Parser.hpp	/^namespace boost { namespace spirit { namespace traits {$/;"	n
+build_array_typeexp	src/Parser.hpp	/^    Ast::type_expression_tarray build_array_typeexp(Ast::type_expression typeexp, unsigned num_brackets)$/;"	f	namespace:Parser
+build_class_declaration	src/Parser.hpp	/^    Ast::type_declaration_class build_class_declaration(bool is_final, bool is_abstract, std::string name, Ast::namedtype extends, std::list<Ast::namedtype> implements, std::list<Ast::declaration> class_body)$/;"	f	namespace:Parser
+build_class_extends	src/Parser.hpp	/^    Ast::namedtype build_class_extends(boost::optional<Ast::namedtype> extends_option)$/;"	f	namespace:Parser
+build_interface_declaration	src/Parser.hpp	/^    Ast::type_declaration_interface build_interface_declaration(std::string name, std::list<Ast::namedtype> extends, std::list<Ast::declaration> interface_body)$/;"	f	namespace:Parser
+build_name	src/Parser.hpp	/^    Ast::name build_name(std::string str, std::vector<std::string> vec)$/;"	f	namespace:Parser
+build_single_import	src/Parser.hpp	/^    Ast::import_declaration_single build_single_import(Ast::name const& name, bool& pass)$/;"	f	namespace:Parser
+call_if	src/utility.hpp	/^void call_if(Maybe<T> maybe, FunctionPointer<FunctionReturnType, T> function)$/;"	f
+character_literal	src/Lexer.hpp	/^        lex::token_def<std::string> character_literal;$/;"	m	struct:java_tokens
+class_body	src/Parser.hpp	/^        qi::rule<Iterator, std::list<Ast::declaration>()> class_body;$/;"	m	struct:Parser::java_grammar
+class_declaration	src/ast.hpp	/^    struct class_declaration$/;"	s	namespace:Ast
+class_extends_decl	src/Parser.hpp	/^        qi::rule<Iterator, Ast::namedtype()> class_extends_decl;$/;"	m	struct:Parser::java_grammar
+class_name	src/ast.hpp	/^        identifier class_name;$/;"	m	struct:Ast::final
+class_type	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_declaration_class()> class_type;$/;"	m	struct:Parser::java_grammar
+concat	src/utility.hpp	/^std::string concat(std::list<T> input, FunctionPointer<std::string, T> string_convert_function, std::string seperator)$/;"	f
+condition	src/ast.hpp	/^        expression condition;$/;"	m	struct:Ast::final
+constructor_declaration	src/Parser.hpp	/^        qi::rule<Iterator, Ast::declaration_constructor()> constructor_declaration;$/;"	m	struct:Parser::java_grammar
+constructor_declaration	src/ast.hpp	/^    struct constructor_declaration$/;"	s	namespace:Ast
+context	src/ast.hpp	/^        expression                   context;$/;"	m	struct:Ast::final
+context	src/ast.hpp	/^        expression            context;$/;"	m	struct:Ast::final
+debug_lexer	src/Lexer_debug.cpp	/^    void debug_lexer(std::string file_contents)$/;"	f	namespace:Lexer
+decimal_literal	src/Lexer.hpp	/^        lex::token_def<std::string> decimal_literal;$/;"	m	struct:java_tokens
+decl	src/ast.hpp	/^        constructor_declaration decl;$/;"	m	struct:Ast::final
+decl	src/ast.hpp	/^        field_declaration decl;$/;"	m	struct:Ast::final
+decl	src/ast.hpp	/^        method_declaration decl;$/;"	m	struct:Ast::final
+double_or	src/Lexer.hpp	/^        lex::token_def<lex::omit>   double_or;$/;"	m	struct:java_tokens
+double_plus	src/Lexer.hpp	/^        lex::token_def<lex::omit>   double_plus;$/;"	m	struct:java_tokens
+element_type	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_expression()> element_type;$/;"	m	struct:Parser::java_grammar
+empty_brackets	src/Parser.hpp	/^        qi::rule<Iterator> empty_brackets;$/;"	m	struct:Parser::java_grammar
+error_text	src/Error.hpp	/^            std::string error_text;$/;"	m	struct:Error::Generic_Error
+exp	src/ast.hpp	/^        expression exp;$/;"	m	struct:Ast::final
+extends	src/ast.hpp	/^        namedtype extends;$/;"	m	struct:Ast::class_declaration
+extends	src/ast.hpp	/^        std::list<namedtype> extends;$/;"	m	struct:Ast::interface_declaration
+fail	src/Parser.hpp	/^            static void fail(Ast::import_declaration_on_demand&)                 { }$/;"	f	struct:boost::spirit::traits::transform_attribute
+false_statement	src/ast.hpp	/^        statement false_statement;$/;"	m	struct:Ast::final
+field_declaration	src/Parser.hpp	/^        qi::rule<Iterator, Ast::declaration_field()> field_declaration;$/;"	m	struct:Parser::java_grammar
+field_declaration	src/ast.hpp	/^    struct field_declaration$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct access_specifier final {};$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct declaration_constructor final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct declaration_field final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct declaration_method final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_ambiguous_cast final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_ambiguous_invoke final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_assignment final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_binop final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_boolean_constant final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_cast final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_character_constant final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_incdec final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_instance_of final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_integer_constant final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_lvalue final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_new final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_new_array final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_non_static_invoke final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_null final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_parentheses final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_simple_invoke final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_static_invoke final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_string_constant final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_this final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct expression_unop final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct import_declaration_on_demand final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct import_declaration_single final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct lvalue_ambiguous_name final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct lvalue_array final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct lvalue_non_static_field final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct name_qualified final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_block final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_empty final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_expression final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_if_then final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_if_then_else final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_local_declaration final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_super_call final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_this_call final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_throw final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_value_return final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_void_return final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct statement_while final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct type_expression_named final$/;"	s	namespace:Ast
+final	src/ast.hpp	/^    struct type_expression_tarray final$/;"	s	namespace:Ast
+find_enum_type	src/Tokens.cpp	/^std::string find_enum_type(unsigned value)$/;"	f
+formal_parameter	src/ast.hpp	/^    typedef std::pair<expression, identifier> formal_parameter;$/;"	t	namespace:Ast
+formal_parameters	src/ast.hpp	/^        std::list<formal_parameter> formal_parameters;$/;"	m	struct:Ast::constructor_declaration
+formal_parameters	src/ast.hpp	/^        std::list<formal_parameter> formal_parameters;$/;"	m	struct:Ast::method_declaration
+generate_ast	src/ast_generate.cpp	/^    Ast::program generate_ast(std::list<std::string> files_contents)$/;"	f	namespace:Ast
+generate_ast	src/ast_generate.cpp	/^    Ast::source_file generate_ast(std::string file_contents)$/;"	f	namespace:Ast
+generic_access_test	src/ast_helper.hpp	/^        bool generic_access_test(const access& arg)$/;"	f	namespace:Ast
+generic_declaration_test	src/ast_helper.hpp	/^        bool generic_declaration_test(const declaration& arg)$/;"	f	namespace:Ast
+generic_test	src/ast_helper.hpp	/^        constexpr bool generic_test(const INPUT&)$/;"	f	namespace:Ast
+generic_type_declaration_test	src/ast_helper.hpp	/^        bool generic_type_declaration_test(const type_declaration& arg)$/;"	f	namespace:Ast
+generic_type_test	src/ast_helper.hpp	/^        bool generic_type_test(const type_expression& arg)$/;"	f	namespace:Ast
+generic_type_test_base	src/ast_helper.hpp	/^        bool generic_type_test_base(const type_expression& t)$/;"	f	namespace:Ast
+getOperationType	src/Tokens.hpp	/^constexpr TypesStart getOperationType(unsigned value)$/;"	f
+identifier	src/Lexer.hpp	/^        lex::token_def<std::string> identifier;$/;"	m	struct:java_tokens
+identifier	src/ast.hpp	/^        identifier(std::string s) : identifier_string(std::move(s)) {}$/;"	f	struct:Ast::identifier
+identifier	src/ast.hpp	/^    struct identifier$/;"	s	namespace:Ast
+identifier_string	src/ast.hpp	/^        std::string identifier_string;$/;"	m	struct:Ast::identifier
+implements	src/ast.hpp	/^        std::list<namedtype> implements;$/;"	m	struct:Ast::class_declaration
+implements_decl	src/Parser.hpp	/^        qi::rule<Iterator, std::list<Ast::namedtype>()> implements_decl;$/;"	m	struct:Parser::java_grammar
+implicit_method_declaration	src/Parser.hpp	/^        qi::rule<Iterator, Ast::declaration_method()> implicit_method_declaration;$/;"	m	struct:Parser::java_grammar
+import	src/Parser.hpp	/^        qi::rule<Iterator, Ast::import_declaration()> import;$/;"	m	struct:Parser::java_grammar
+import	src/ast.hpp	/^        name import;$/;"	m	struct:Ast::final
+import_on_demand	src/Parser.hpp	/^        qi::rule<Iterator, Ast::import_declaration_on_demand()> import_on_demand;$/;"	m	struct:Parser::java_grammar
+import_single	src/Parser.hpp	/^        qi::rule<Iterator, Ast::import_declaration_single()> import_single;$/;"	m	struct:Parser::java_grammar
+imports	src/Parser.hpp	/^        qi::rule<Iterator, std::list<Ast::import_declaration>()> imports;$/;"	m	struct:Parser::java_grammar
+imports	src/ast.hpp	/^        std::list<import_declaration> imports;$/;"	m	struct:Ast::source_file
+inc_dec_op_generator	src/ast.hpp	/^    template <typename Tag> struct inc_dec_op_generator { };$/;"	s	namespace:Ast
+index_exp	src/ast.hpp	/^        expression index_exp;$/;"	m	struct:Ast::final
+inherit_super	src/utility.hpp	/^    explicit inherit_super(A&&... args) : T(std::forward<A>(args)...) {}$/;"	f	struct:inherit_super
+inherit_super	src/utility.hpp	/^struct inherit_super : T $/;"	s
+inside	src/ast.hpp	/^        expression inside;$/;"	m	struct:Ast::final
+interface_body	src/Parser.hpp	/^        qi::rule<Iterator, std::list<Ast::declaration>()> interface_body;$/;"	m	struct:Parser::java_grammar
+interface_declaration	src/ast.hpp	/^    struct interface_declaration$/;"	s	namespace:Ast
+interface_extends_decl	src/Parser.hpp	/^        qi::rule<Iterator, std::list<Ast::namedtype>()> interface_extends_decl;$/;"	m	struct:Parser::java_grammar
+interface_member_declaration	src/Parser.hpp	/^        qi::rule<Iterator, Ast::declaration()> interface_member_declaration;$/;"	m	struct:Parser::java_grammar
+interface_type	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_declaration_interface()> interface_type;$/;"	m	struct:Parser::java_grammar
+is_abstract	src/ast.hpp	/^        bool is_abstract;$/;"	m	struct:Ast::class_declaration
+is_abstract	src/ast.hpp	/^        bool is_abstract;$/;"	m	struct:Ast::method_declaration
+is_array	src/ast_helper.hpp	/^    constexpr auto is_array       = generic_type_test<const type_expression_tarray>;$/;"	m	namespace:Ast
+is_base_type	src/ast_helper.hpp	/^    constexpr auto is_base_type   = generic_type_test<const type_expression_base>;$/;"	m	namespace:Ast
+is_boolean	src/ast_helper.hpp	/^    constexpr auto is_boolean = generic_type_test_base<const base_type_boolean>;$/;"	m	namespace:Ast
+is_byte	src/ast_helper.hpp	/^    constexpr auto is_byte    = generic_type_test_base<const base_type_byte>;$/;"	m	namespace:Ast
+is_char	src/ast_helper.hpp	/^    constexpr auto is_char    = generic_type_test_base<const base_type_char>;$/;"	m	namespace:Ast
+is_class	src/ast_helper.hpp	/^    constexpr auto is_class       = generic_type_declaration_test<const type_declaration_class>;$/;"	m	namespace:Ast
+is_constructor	src/ast_helper.hpp	/^    constexpr auto is_constructor = generic_declaration_test<const declaration_constructor>;$/;"	m	namespace:Ast
+is_field	src/ast_helper.hpp	/^    constexpr auto is_field       = generic_declaration_test<const declaration_field>;$/;"	m	namespace:Ast
+is_final	src/ast.hpp	/^        bool is_final;$/;"	m	struct:Ast::class_declaration
+is_final	src/ast.hpp	/^        bool is_final;$/;"	m	struct:Ast::field_declaration
+is_final	src/ast.hpp	/^        bool is_final;$/;"	m	struct:Ast::method_declaration
+is_int	src/ast_helper.hpp	/^    constexpr auto is_int     = generic_type_test_base<const base_type_int>;$/;"	m	namespace:Ast
+is_interface	src/ast_helper.hpp	/^    constexpr auto is_interface   = generic_type_declaration_test<const type_declaration_interface>;$/;"	m	namespace:Ast
+is_method	src/ast_helper.hpp	/^    constexpr auto is_method      = generic_declaration_test<const declaration_method>;$/;"	m	namespace:Ast
+is_named_type	src/ast_helper.hpp	/^    constexpr auto is_named_type  = generic_type_test<const type_expression_named>;$/;"	m	namespace:Ast
+is_protected	src/ast_helper.hpp	/^    constexpr auto is_protected   = generic_access_test<const access_protected>;$/;"	m	namespace:Ast
+is_public	src/ast_helper.hpp	/^    constexpr auto is_public      = generic_access_test<const access_public>;$/;"	m	namespace:Ast
+is_short	src/ast_helper.hpp	/^    constexpr auto is_short   = generic_type_test_base<const base_type_short>;$/;"	m	namespace:Ast
+is_static	src/ast.hpp	/^        bool is_static;$/;"	m	struct:Ast::field_declaration
+is_static	src/ast.hpp	/^        bool is_static;$/;"	m	struct:Ast::method_declaration
+is_void	src/ast_helper.hpp	/^    constexpr auto is_void    = generic_type_test_base<const base_type_void>;$/;"	m	namespace:Ast
+java_grammar	src/Parser.hpp	/^            java_grammar(TokenDef const& tok)$/;"	f	struct:Parser::java_grammar
+java_grammar	src/Parser.hpp	/^        struct java_grammar : qi::grammar<Iterator, Ast::source_file()>$/;"	s	namespace:Parser
+java_tokens	src/Lexer.hpp	/^        java_tokens()$/;"	f	struct:java_tokens
+java_tokens	src/Lexer.hpp	/^    struct java_tokens : lex::lexer<Lexer>$/;"	s
+lexer	src/Lexer.hpp	/^    typedef java_tokens<lexer_type> lexer;$/;"	t	namespace:Lexer
+lexer_exposed_types	src/Lexer.hpp	/^    typedef boost::mpl::vector<std::string> lexer_exposed_types;$/;"	t	namespace:Lexer
+lexer_iterator	src/Lexer.hpp	/^    typedef lexer::iterator_type lexer_iterator;$/;"	t	namespace:Lexer
+lexer_iterator_type	src/Lexer.hpp	/^    typedef std::string::iterator lexer_iterator_type;$/;"	t	namespace:Lexer
+lexer_null_value	src/Lexer_Position.hpp	/^const LexerPosition lexer_null_value = 0;$/;"	v
+lexer_token_type	src/Lexer.hpp	/^    typedef lex::lexertl::token<lexer_iterator_type, lexer_exposed_types, boost::mpl::false_> lexer_token_type;$/;"	t	namespace:Lexer
+lexer_type	src/Lexer.hpp	/^    typedef lex::lexertl::actor_lexer<lexer_token_type> lexer_type;$/;"	t	namespace:Lexer
+line_comment	src/Lexer.hpp	/^        lex::token_def<std::string> line_comment;$/;"	m	struct:java_tokens
+line_terminator	src/Lexer.hpp	/^        lex::token_def<lex::omit>   line_terminator;$/;"	m	struct:java_tokens
+loop_statement	src/ast.hpp	/^        statement loop_statement;$/;"	m	struct:Ast::final
+main	src/main.cpp	/^int main(int argc, char* argv[])$/;"	f
+make_visitor	src/ast_helper.hpp	/^    typename visitor_t<T, Fs...>::type make_visitor(Fs...x) { return {x...}; }$/;"	f	namespace:visitor_galore
+member_decl	src/Parser.hpp	/^        qi::rule<Iterator, Ast::declaration()> member_decl;$/;"	m	struct:Parser::java_grammar
+members	src/ast.hpp	/^        std::list<declaration> members;$/;"	m	struct:Ast::class_declaration
+members	src/ast.hpp	/^        std::list<declaration> members;$/;"	m	struct:Ast::interface_declaration
+method_body	src/ast.hpp	/^        Maybe<body> method_body;$/;"	m	struct:Ast::constructor_declaration
+method_body	src/ast.hpp	/^        Maybe<body> method_body;$/;"	m	struct:Ast::method_declaration
+method_declaration	src/Parser.hpp	/^        qi::rule<Iterator, Ast::declaration_method()> method_declaration;$/;"	m	struct:Parser::java_grammar
+method_declaration	src/ast.hpp	/^    struct method_declaration$/;"	s	namespace:Ast
+method_name	src/ast.hpp	/^        identifier            method_name;$/;"	m	struct:Ast::final
+n_empty_brackets	src/Parser.hpp	/^        qi::rule<Iterator, unsigned()> n_empty_brackets;$/;"	m	struct:Parser::java_grammar
+name	src/Parser.hpp	/^        qi::rule<Iterator, Ast::name()> name;$/;"	m	struct:Parser::java_grammar
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::class_declaration
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::constructor_declaration
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::field_declaration
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::final
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::interface_declaration
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::method_declaration
+name	src/ast.hpp	/^        identifier name;$/;"	m	struct:Ast::name_simple
+name	src/ast.hpp	/^        std::list<identifier> name;$/;"	m	struct:Ast::final
+name	src/ast.hpp	/^        std::string name;$/;"	m	struct:Ast::source_file
+name_simple	src/ast.hpp	/^    struct name_simple {$/;"	s	namespace:Ast
+name_to_identifier_list	src/ast_helper.cpp	/^    std::list<identifier> name_to_identifier_list(name const& navn)$/;"	f	namespace:Ast
+name_to_identifier_list	src/ast_helper.cpp	/^    std::list<identifier> name_to_identifier_list(name_qualified const& navn) { return navn.name; }$/;"	f	namespace:Ast
+name_to_identifier_list	src/ast_helper.cpp	/^    std::list<identifier> name_to_identifier_list(name_simple    const& navn) { return { navn.name }; }$/;"	f	namespace:Ast
+name_to_string	src/ast_helper.cpp	/^    std::string name_to_string(const name& navn)$/;"	f	namespace:Ast
+named_typeexp	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_expression_named()> named_typeexp;$/;"	m	struct:Parser::java_grammar
+noexcept	src/Error.hpp	/^            virtual ~Generic_Error() noexcept;$/;"	m	struct:Error::Generic_Error
+operand	src/ast.hpp	/^        expression operand;$/;"	m	struct:Ast::final
+operand1	src/ast.hpp	/^        expression operand1;$/;"	m	struct:Ast::final
+operand2	src/ast.hpp	/^        expression operand2;$/;"	m	struct:Ast::final
+operator ()	src/Lexer_debug.cpp	/^    bool operator()(Token const& t, std::vector<std::pair<unsigned, std::string>>&) const$/;"	f	struct:token_collector
+operatur	src/ast.hpp	/^        binop      operatur;$/;"	m	struct:Ast::final
+operatur	src/ast.hpp	/^        inc_dec_op operatur;$/;"	m	struct:Ast::final
+operatur	src/ast.hpp	/^        unop       operatur;$/;"	m	struct:Ast::final
+optional_initializer	src/ast.hpp	/^        Maybe<expression> optional_initializer;$/;"	m	struct:Ast::field_declaration
+optional_initializer	src/ast.hpp	/^        Maybe<expression> optional_initializer;$/;"	m	struct:Ast::final
+optional_package	src/Parser.hpp	/^        qi::rule<Iterator, Maybe<Ast::package_declaration>()> optional_package;$/;"	m	struct:Parser::java_grammar
+override	src/Error.hpp	/^            const char* what() const noexcept final override;$/;"	m	struct:Error::Generic_Error
+package	src/Parser.hpp	/^        qi::rule<Iterator, Ast::package_declaration()> package;$/;"	m	struct:Parser::java_grammar
+package	src/ast.hpp	/^        Maybe<package_declaration> package;$/;"	m	struct:Ast::source_file
+package_declaration	src/ast.hpp	/^    typedef name package_declaration;$/;"	t	namespace:Ast
+post	src/Parser.hpp	/^            static void post(Ast::import_declaration_on_demand& val, type attr)  { val = { attr }; }$/;"	f	struct:boost::spirit::traits::transform_attribute
+pre	src/Parser.hpp	/^            static type pre (Ast::import_declaration_on_demand&)                 { return {}; }$/;"	f	struct:boost::spirit::traits::transform_attribute
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(declaration const& decl)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(declaration_constructor const& constructor)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(declaration_field const& field)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(declaration_method const& method)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_ambiguous_cast const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_ambiguous_invoke const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_assignment const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_binop const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_boolean_constant const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_cast const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_character_constant const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_incdec const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_instance_of const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_integer_constant const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_lvalue const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_new const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_new_array const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_non_static_invoke const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_null const&)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_parentheses const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_simple_invoke const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_static_invoke const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_string_constant const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_this const&)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(expression_unop const& exp)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(import_declaration const& import)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(import_declaration_on_demand const& import)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(import_declaration_single const& import)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(lvalue const& lvalue)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(lvalue_ambiguous_name const& lvalue)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(lvalue_array const& lvalue)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(lvalue_non_static_field const& lvalue)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(package_declaration const& package)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(program const& prog)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(source_file const& sf)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_block const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_empty const&)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_expression const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_if_then const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_if_then_else const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_local_declaration const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_super_call const&)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_this_call const&)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_throw const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_value_return const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_void_return const&)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(statement_while const& stm)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_declaration const& type_decl)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_declaration_class const& klass)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_declaration_interface const& interface)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_expression const& type)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_expression_base const& type)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_expression_named const& type)$/;"	f	namespace:Ast
+pretty_print	src/ast_pp.cpp	/^    void pretty_print(type_expression_tarray const& type)$/;"	f	namespace:Ast
+primitive_typeexp	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_expression_base()> primitive_typeexp;$/;"	m	struct:Parser::java_grammar
+print_help	src/main.cpp	/^void print_help()$/;"	f
+program	src/ast.hpp	/^    typedef std::list<source_file> program;$/;"	t	namespace:Ast
+read_from_file	src/main.cpp	/^std::string read_from_file(char const* infile)$/;"	f
+reference_typeexp	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_expression()> reference_typeexp;$/;"	m	struct:Parser::java_grammar
+result_type	src/Lexer_debug.cpp	/^    typedef bool result_type;$/;"	t	struct:token_collector	file:
+return_type	src/ast.hpp	/^        type_expression return_type;$/;"	m	struct:Ast::method_declaration
+source_file	src/Parser.hpp	/^        qi::rule<Iterator, Ast::source_file()> source_file;$/;"	m	struct:Parser::java_grammar
+source_file	src/ast.hpp	/^    struct source_file$/;"	s	namespace:Ast
+spirit	src/Parser.hpp	/^namespace boost { namespace spirit { namespace traits {$/;"	n	namespace:boost
+start	src/Parser.hpp	/^        qi::rule<Iterator, Ast::source_file()> start;$/;"	m	struct:Parser::java_grammar
+string_literal	src/Lexer.hpp	/^        lex::token_def<std::string> string_literal;$/;"	m	struct:java_tokens
+super	src/utility.hpp	/^    typedef inherit_super super; $/;"	t	struct:inherit_super
+throwee	src/ast.hpp	/^        expression throwee;$/;"	m	struct:Ast::final
+throws	src/ast.hpp	/^        std::list<namedtype> throws;$/;"	m	struct:Ast::constructor_declaration
+throws	src/ast.hpp	/^        std::list<namedtype> throws;$/;"	m	struct:Ast::method_declaration
+to_string	src/to_string.hpp	/^inline std::string to_string(T val)$/;"	f
+token_collector	src/Lexer_debug.cpp	/^struct token_collector$/;"	s	file:
+traits	src/Parser.hpp	/^namespace boost { namespace spirit { namespace traits {$/;"	n	namespace:boost::spirit
+transform_attribute	src/Parser.hpp	/^        struct transform_attribute<Ast::import_declaration_on_demand, Ast::name, qi::domain, void>$/;"	s	namespace:boost::spirit::traits
+true_statement	src/ast.hpp	/^        statement true_statement;$/;"	m	struct:Ast::final
+type	src/Parser.hpp	/^            typedef Ast::name type;$/;"	t	struct:boost::spirit::traits::transform_attribute
+type	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_declaration()> type;$/;"	m	struct:Parser::java_grammar
+type	src/ast.hpp	/^        expression type;$/;"	m	struct:Ast::final
+type	src/ast.hpp	/^        namedtype             type;$/;"	m	struct:Ast::final
+type	src/ast.hpp	/^        namedtype type;$/;"	m	struct:Ast::final
+type	src/ast.hpp	/^        type_declaration type;$/;"	m	struct:Ast::source_file
+type	src/ast.hpp	/^        type_expression              type;$/;"	m	struct:Ast::final
+type	src/ast.hpp	/^        type_expression       type;$/;"	m	struct:Ast::final
+type	src/ast.hpp	/^        type_expression type;$/;"	m	struct:Ast::field_declaration
+type	src/ast.hpp	/^        type_expression type;$/;"	m	struct:Ast::final
+type	src/ast_helper.hpp	/^        typedef visitor_t type;$/;"	t	struct:visitor_galore::visitor_t
+type_decl_kind	src/ast_helper.cpp	/^    std::string type_decl_kind(const type_declaration& td)$/;"	f	namespace:Ast
+type_decl_name	src/ast_helper.cpp	/^    std::string type_decl_name(const type_declaration& td)$/;"	f	namespace:Ast
+type_expression_named	src/ast.hpp	/^        type_expression_named(namedtype t) : type(std::move(t)) {}$/;"	f	struct:Ast::final
+typeexp	src/Parser.hpp	/^        qi::rule<Iterator, Ast::type_expression()> typeexp;$/;"	m	struct:Parser::java_grammar
+typename_list	src/Parser.hpp	/^        qi::rule<Iterator, std::list<Ast::namedtype>()> typename_list;$/;"	m	struct:Parser::java_grammar
+unop_generator	src/ast.hpp	/^    template <typename Tag> struct unop_generator { };$/;"	s	namespace:Ast
+unop_to_string	src/ast_helper.cpp	/^    std::string unop_to_string(const unop& uno)$/;"	f	namespace:Ast
+unpack_list	src/utility.hpp	/^std::list<FunctionReturnType> unpack_list(std::list<T> list, FunctionPointer<FunctionReturnType,T> function)$/;"	f
+unpack_list	src/utility.hpp	/^void unpack_list(std::list<T> list, FunctionPointer<void,T> function)$/;"	f
+value	src/ast.hpp	/^        bool value;$/;"	m	struct:Ast::final
+value	src/ast.hpp	/^        expression      value;$/;"	m	struct:Ast::final
+value	src/ast.hpp	/^        expression value;$/;"	m	struct:Ast::final
+value	src/ast.hpp	/^        std::string value;$/;"	m	struct:Ast::final
+variable	src/ast.hpp	/^        lvalue     variable;$/;"	m	struct:Ast::final
+variable	src/ast.hpp	/^        lvalue variable;$/;"	m	struct:Ast::final
+visitor_galore	src/ast_helper.hpp	/^namespace visitor_galore \/\/ this is my make-shift replacement for typeswitch (I couldn't find it\/make it work)$/;"	n
+visitor_t	src/ast_helper.hpp	/^        visitor_t(F f) : F(f) {}$/;"	f	struct:visitor_galore::visitor_t
+visitor_t	src/ast_helper.hpp	/^        visitor_t(F1 head, Fs...tail) : F1(head), visitor_t<T, Fs...>::type(tail...) {}$/;"	f	struct:visitor_galore::visitor_t
+visitor_t	src/ast_helper.hpp	/^    struct visitor_t<T, F1, Fs...> : F1, visitor_t<T, Fs...>::type {$/;"	s	namespace:visitor_galore
+visitor_t	src/ast_helper.hpp	/^    template<typename T, class F> struct visitor_t<T, F> : F, boost::static_visitor<T> {$/;"	s	namespace:visitor_galore
+whitespace	src/Lexer.hpp	/^        lex::token_def<lex::omit>   whitespace;$/;"	m	struct:java_tokens

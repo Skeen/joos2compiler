@@ -1,10 +1,17 @@
 #ifndef _COMPILER_AST_HPP
 #define _COMPILER_AST_HPP
 
-#include "Lexer_Position.hpp"
-#include "Utility.hpp"
+#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+#define BOOST_MPL_LIMIT_LIST_SIZE 30
+#define BOOST_MPL_LIMIT_VECTOR_SIZE 30
 
-#include <Maybe/Maybe.hpp>
+#include "Lexer_Position.hpp"
+#include "utility.hpp"
+
+#include <boost/fusion/adapted/struct.hpp>
+#include <boost/variant.hpp>
+#include <boost/optional.hpp>
+template <typename T> using Maybe = boost::optional<T>;
 
 #include <string>
 #include <list>
@@ -18,586 +25,413 @@ namespace Ast
 {
     struct identifier
     {
-        identifier(std::string identifier_string, LexerPosition position = lexer_null_value)
-            : position(position), identifier_string(identifier_string)
-        {
-        }
-
-        LexerPosition position;
+        identifier() = default;
+        identifier(identifier const&) = default;
+        identifier(std::string s) : identifier_string(std::move(s)) {}
         std::string identifier_string;
     };
 
-    struct name
-    {
-        protected:
-            name(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~name() {}
-            LexerPosition position;
-    };
-
-    typedef name namedtype;
-
-    struct name_simple final : inherit_super<name>
-    {
-        name_simple(identifier name, LexerPosition position = lexer_null_value)
-            : super(position), name(name)
-        {
-        }
-
+    struct name_simple {
         identifier name;
     };
 
-    struct name_qualified final : inherit_super<name>
+    struct name_qualified final
     {
-        name_qualified(std::list<identifier> name, LexerPosition position = lexer_null_value)
-            : super(position), name(name)
-        {
-        }
-
         std::list<identifier> name;
     };
 
+    using name      = boost::variant<name_simple, name_qualified>;
+    using namedtype = name;
+
     /* *************** Types *************** */
-    struct base_type
-    {
-        protected:
-            base_type() {}
-        public:
-            virtual ~base_type() {}
-    };
-    struct base_type_void final : inherit_super<base_type> {};
-    struct base_type_byte final : inherit_super<base_type> {};
-    struct base_type_short final : inherit_super<base_type> {};
-    struct base_type_int final : inherit_super<base_type> {};
-    //struct base_type_long final : inherit_super<base_type> {};
-    struct base_type_char final : inherit_super<base_type> {};
-    //struct base_type_float final : inherit_super<base_type> {};
-    //struct base_type_double final : inherit_super<base_type> {};
-    struct base_type_boolean final : inherit_super<base_type> {};
+    template <typename Tag> struct base_type_generator { };
 
-    struct type_expression
-    {
-        protected:
-            type_expression(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~type_expression() {}
-            LexerPosition position;
-    };
+    using base_type_void     = base_type_generator<struct void_tag>;
+    using base_type_byte     = base_type_generator<struct byte_tag>;
+    using base_type_short    = base_type_generator<struct short_tag>;
+    using base_type_int      = base_type_generator<struct int_tag>;
+    //using base_type_long   = base_type_generator<struct long_tag>;
+    using base_type_char     = base_type_generator<struct char_tag>;
+    //using base_type_float  = base_type_generator<struct float_tag>;
+    //using base_type_double = base_type_generator<struct double_tag>;
+    using base_type_boolean  = base_type_generator<struct boolean_tag>;
 
-    struct type_expression_base final : inherit_super<type_expression>
-    {
-        type_expression_base(const base_type* type, LexerPosition position = lexer_null_value)
-            : super(position), type(type)
-        {
-        }
+    using type_expression_base = boost::variant<
+        base_type_void,
+        base_type_byte,
+        base_type_short,
+        base_type_int,
+        //base_type_long,
+        base_type_char,
+        //base_type_float,
+        //base_type_double,
+        base_type_boolean>;
 
-        const base_type* type;
+    struct type_expression_tarray;
+    
+    struct type_expression_named final
+    {
+        type_expression_named() = default;
+        type_expression_named(type_expression_named const&) = default;
+        type_expression_named(namedtype t) : type(std::move(t)) {}
+        namedtype type;
     };
 
-    struct type_expression_tarray final : inherit_super<type_expression>
-    {
-        type_expression_tarray(const type_expression* type, LexerPosition position = lexer_null_value)
-            : super(position), type(type)
-        {
-        }
+    using type_expression = boost::variant<
+        type_expression_base, type_expression_named, boost::recursive_wrapper<type_expression_tarray> >;
 
-        const type_expression* type;
+    struct type_expression_tarray final
+    {
+        type_expression type;
     };
     
-    struct type_expression_named final : inherit_super<type_expression>
-    {
-        type_expression_named(const namedtype* type, LexerPosition position = lexer_null_value)
-            : super(position), type(type)
-        {
-        }
-
-        const namedtype* type;
-    };
-
     /* *************** Operators *************** */
     // Binary operators
-    struct binop
+    template <typename Tag> struct binop_generator
     {
-        protected:
-            binop() {}
-        public:
-            virtual ~binop() {} 
     };
     // Arithmetic operators
-    struct binop_plus final : inherit_super<binop> {};
-    struct binop_minus final : inherit_super<binop> {};
-    struct binop_times final : inherit_super<binop> {};
-    struct binop_divide final : inherit_super<binop> {};
-    struct binop_modulo final : inherit_super<binop> {};
+    using binop_plus    = binop_generator<struct tag_binop_plus >;
+    using binop_minus   = binop_generator<struct tag_binop_minus>;
+    using binop_times   = binop_generator<struct tag_binop_times>;
+    using binop_divide  = binop_generator<struct tag_binop_divide>;
+    using binop_modulo  = binop_generator<struct tag_binop_modulo>;
     // Comparison operators
-    struct binop_eq final : inherit_super<binop> {};
-    struct binop_ne final : inherit_super<binop> {};
-    struct binop_lt final : inherit_super<binop> {};
-    struct binop_le final : inherit_super<binop> {};
-    struct binop_gt final : inherit_super<binop> {};
-    struct binop_ge final : inherit_super<binop> {};
-    struct binop_and final : inherit_super<binop> {};
-    struct binop_or final : inherit_super<binop> {};
+    using binop_eq      = binop_generator<struct tag_binop_eq>;
+    using binop_ne      = binop_generator<struct tag_binop_ne>;
+    using binop_lt      = binop_generator<struct tag_binop_lt>;
+    using binop_le      = binop_generator<struct tag_binop_le>;
+    using binop_gt      = binop_generator<struct tag_binop_gt>;
+    using binop_ge      = binop_generator<struct tag_binop_ge>;
+    using binop_and     = binop_generator<struct tag_binop_and>;
+    using binop_or      = binop_generator<struct tag_binop_or>;
     // Binary operators
-    struct binop_xor final : inherit_super<binop> {};
-    struct binop_lazyand final : inherit_super<binop> {};
-    struct binop_lazyor final : inherit_super<binop> {};
+    using binop_xor     = binop_generator<struct tag_binop_xor>;
+    using binop_lazyand = binop_generator<struct tag_binop_lazyand>;
+    using binop_lazyor  = binop_generator<struct tag_binop_lazyor>;
+
+    using binop = boost::variant<
+        binop_plus, binop_minus, binop_times, binop_divide, binop_modulo,
+        // Comparison operators
+        binop_eq, binop_ne, binop_lt, binop_le, binop_gt, binop_ge, binop_and, binop_or,
+        // Binary operators
+        binop_xor, binop_lazyand, binop_lazyor>;
 
     // Unary operators
-    struct unop
-    {
-        protected:
-            unop() {}
-        public:
-            virtual ~unop() {} 
-    };
-    struct unop_negate final : inherit_super<unop> {};     // minus
-    struct unop_complement final : inherit_super<unop> {}; // complement
+    template <typename Tag> struct unop_generator { };
+    using unop_negate     = unop_generator<struct tag_unop_negate>;
+    using unop_complement = unop_generator<struct tag_unop_complement>;
+
+    using unop = boost::variant<unop_negate, unop_complement>;
 
     // Increment/Decrement operators
-    struct inc_dec_op
-    {
-        protected:
-            inc_dec_op() {}
-        public:
-            virtual ~inc_dec_op() {} 
-    };
-    struct inc_dec_op_preinc final : inherit_super<inc_dec_op> {};
-    struct inc_dec_op_predec final : inherit_super<inc_dec_op> {};
-    struct inc_dec_op_postinc final : inherit_super<inc_dec_op> {};
-    struct inc_dec_op_postdec final : inherit_super<inc_dec_op> {};
+    template <typename Tag> struct inc_dec_op_generator { };
+    using inc_dec_op_preinc  = inc_dec_op_generator<struct tag_inc_dec_op_preinc>;
+    using inc_dec_op_predec  = inc_dec_op_generator<struct tag_inc_dec_op_preinc>;
+    using inc_dec_op_postinc = inc_dec_op_generator<struct tag_inc_dec_op_preinc>;
+    using inc_dec_op_postdec = inc_dec_op_generator<struct tag_inc_dec_op_preinc>;
+
+    using inc_dec_op = boost::variant<
+        inc_dec_op_preinc,
+        inc_dec_op_predec,
+        inc_dec_op_postinc,
+        inc_dec_op_postdec>;
 
     /* *************** Expressions *************** */
     // Prototype for expression;
-    struct expression;
 
     // L-Value
-    struct lvalue
+    struct lvalue_non_static_field;
+    struct lvalue_array;
+    struct lvalue_ambiguous_name final
     {
-        protected:
-            lvalue(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~lvalue() {}
-            LexerPosition position;
+        name ambiguous;
     };
 
-    struct lvalue_non_static_field final : inherit_super<lvalue>
-    {
-        lvalue_non_static_field(const expression* exp, identifier name, LexerPosition position = lexer_null_value)
-            : super(position), exp(exp), name(name)
-        {
-        }
-
-        const expression* exp;
-        identifier name;
-    };
-
-    struct lvalue_array final : inherit_super<lvalue>
-    {
-        lvalue_array(const expression* array_exp, const expression* index_exp, LexerPosition position = lexer_null_value)
-            : super(position), array_exp(array_exp), index_exp(index_exp)
-        {
-        }
-
-        const expression* array_exp;
-        const expression* index_exp;
-    };
-    
-    struct lvalue_ambiguous_name final : inherit_super<lvalue>
-    {
-        lvalue_ambiguous_name(const name* ambiguous, LexerPosition position = lexer_null_value)
-            : super(position), ambiguous(ambiguous)
-        {
-        }
-
-        const name* ambiguous;
-    };
+    using lvalue = boost::variant<
+        boost::recursive_wrapper<lvalue_non_static_field>,
+        boost::recursive_wrapper<lvalue_array>>;
 
     // Expressions
-    struct expression
+    struct expression_integer_constant final
     {
-        protected:
-            expression(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~expression() {}
-            LexerPosition position;
-    };
-
-    struct expression_binop final : inherit_super<expression>
-    {
-        expression_binop(const expression* operand1, const binop* operatur, const expression* operand2, LexerPosition position = lexer_null_value)
-            : super(position), operand1(operand1), operatur(operatur), operand2(operand2)
-        {
-        }
-
-        const expression* operand1;
-        const binop* operatur;
-        const expression* operand2;
-    };
-
-    struct expression_unop final : inherit_super<expression>
-    {
-        expression_unop(const unop* operatur, const expression* operand, LexerPosition position = lexer_null_value)
-            : super(position), operatur(operatur), operand(operand)
-        {
-        }
-
-        const unop* operatur;
-        const expression* operand;
-    };
-
-    struct expression_integer_constant final : inherit_super<expression>
-    {
-        expression_integer_constant(std::string value, LexerPosition position = lexer_null_value)
-            : super(position), value(value)
-        {
-        }
-
         std::string value;
     };
     
-    struct expression_character_constant final : inherit_super<expression>
+    struct expression_character_constant final
     {
-        expression_character_constant(std::string value, LexerPosition position = lexer_null_value)
-            : super(position), value(value)
-        {
-        }
-
         std::string value;
     };
 
-    struct expression_string_constant final : inherit_super<expression>
+    struct expression_string_constant final
     {
-        expression_string_constant(std::string value, LexerPosition position = lexer_null_value)
-            : super(position), value(value)
-        {
-        }
-
         std::string value;
     };
 
-    struct expression_boolean_constant final : inherit_super<expression>
+    struct expression_boolean_constant final
     {
-        expression_boolean_constant(bool value, LexerPosition position = lexer_null_value)
-            : super(position), value(value)
-        {
-        }
-
         bool value;
     };
 
-    struct expression_null final : inherit_super<expression>
+    struct expression_null final
     {
-        expression_null(LexerPosition position = lexer_null_value)
-            : super(position)
-        {
-        }
     };
 
-    struct expression_this final : inherit_super<expression>
+    struct expression_this final
     {
-        expression_this(LexerPosition position = lexer_null_value)
-            : super(position)
-        {
-        }
     };
 
-    struct expression_static_invoke final : inherit_super<expression>
-    {
-        expression_static_invoke(const namedtype* type, identifier method_name, std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), type(type), method_name(method_name), arguments(arguments)
-        {
-        }
 
-        const namedtype* type;
-        identifier method_name;
-        std::list<const expression*> arguments;
+    struct expression_ambiguous_cast;
+    struct expression_ambiguous_invoke;
+    struct expression_assignment;
+    struct expression_binop;
+    struct expression_boolean_constant;
+    struct expression_cast;
+    struct expression_incdec;
+    struct expression_instance_of;
+    struct expression_integer_constant;
+    struct expression_lvalue;
+    struct expression_new;
+    struct expression_new_array;
+    struct expression_non_static_invoke;
+    struct expression_null;
+    struct expression_parentheses;
+    struct expression_simple_invoke;
+    struct expression_static_invoke;
+    struct expression_string_constant;
+    struct expression_this;
+    struct expression_unop;
+
+
+    using expression = boost::variant<
+        expression_integer_constant,
+        expression_string_constant,
+        expression_boolean_constant,
+        expression_null,
+        expression_this,
+        lvalue_ambiguous_name,
+
+        boost::recursive_wrapper<expression_binop>,
+        boost::recursive_wrapper<expression_unop>,
+        boost::recursive_wrapper<expression_static_invoke>,
+        boost::recursive_wrapper<expression_non_static_invoke>,
+        boost::recursive_wrapper<expression_simple_invoke>,
+        boost::recursive_wrapper<expression_ambiguous_invoke>,
+        boost::recursive_wrapper<expression_instance_of>,
+        boost::recursive_wrapper<expression_parentheses>,
+        boost::recursive_wrapper<lvalue_non_static_field>,
+        boost::recursive_wrapper<lvalue_array>,
+        boost::recursive_wrapper<expression_binop>,
+        boost::recursive_wrapper<expression_unop>,
+        boost::recursive_wrapper<expression_static_invoke>,
+        boost::recursive_wrapper<expression_non_static_invoke>,
+        boost::recursive_wrapper<expression_simple_invoke>,
+        boost::recursive_wrapper<expression_ambiguous_invoke>,
+        boost::recursive_wrapper<expression_new>,
+        boost::recursive_wrapper<expression_new_array>,
+        boost::recursive_wrapper<expression_lvalue>,
+        boost::recursive_wrapper<expression_assignment>,
+        boost::recursive_wrapper<expression_incdec>,
+        boost::recursive_wrapper<expression_cast>,
+        boost::recursive_wrapper<expression_ambiguous_cast>,
+        boost::recursive_wrapper<expression_instance_of>
+        >;
+
+    struct lvalue_non_static_field final
+    {
+        expression exp;
+        identifier name;
     };
 
-    struct expression_non_static_invoke final : inherit_super<expression>
+    struct lvalue_array final
     {
-        expression_non_static_invoke(const expression* context, identifier method_name, std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), context(context), method_name(method_name), arguments(arguments)
-        {
-        }
-
-        const expression* context;
-        identifier method_name;
-        std::list<const expression*> arguments;
-    };
-
-    struct expression_simple_invoke final : inherit_super<expression>
-    {
-        expression_simple_invoke(identifier method_name, std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), method_name(method_name), arguments(arguments)
-        {
-        }
-
-        identifier method_name;
-        std::list<const expression*> arguments;
-    };
-
-    struct expression_ambiguous_invoke final : inherit_super<expression>
-    {
-        expression_ambiguous_invoke(const name* ambiguous, identifier method_name, std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), ambiguous(ambiguous), method_name(method_name), arguments(arguments)
-        {
-        }
-
-        const name* ambiguous;
-        identifier method_name;
-        std::list<const expression*> arguments;
-    };
-    
-    struct expression_new final : inherit_super<expression>
-    {
-        expression_new(const type_expression* type, std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), type(type), arguments(arguments)
-        {
-        }
-
-        const type_expression* type;
-        std::list<const expression*> arguments;
-    };
-    
-    struct expression_new_array final : inherit_super<expression>
-    {
-        expression_new_array(const type_expression* type, const expression* context, std::list<Maybe<const expression*>> arguments, LexerPosition position = lexer_null_value)
-            : super(position), type(type), context(context), arguments(arguments)
-        {
-        }
-
-        const type_expression* type;
-        const expression* context;
-        std::list<Maybe<const expression*>> arguments;
+        expression array_exp;
+        expression index_exp;
     };
     
-    struct expression_lvalue final : inherit_super<expression>
+    struct expression_binop final
     {
-        expression_lvalue(const lvalue* variable, LexerPosition position = lexer_null_value)
-            : super(position), variable(variable)
-        {
-        }
+        expression operand1;
+        binop      operatur;
+        expression operand2;
+    };
 
-        const lvalue* variable;
+    struct expression_unop final
+    {
+        unop       operatur;
+        expression operand;
+    };
+
+    struct expression_static_invoke final
+    {
+        namedtype             type;
+        identifier            method_name;
+        std::list<expression> arguments;
+    };
+
+    struct expression_non_static_invoke final
+    {
+        expression            context;
+        identifier            method_name;
+        std::list<expression> arguments;
+    };
+
+    struct expression_simple_invoke final
+    {
+        identifier            method_name;
+        std::list<expression> arguments;
+    };
+
+    struct expression_ambiguous_invoke final
+    {
+        name                  ambiguous;
+        identifier            method_name;
+        std::list<expression> arguments;
     };
     
-    struct expression_assignment final : inherit_super<expression>
+    struct expression_new final
     {
-        expression_assignment(const lvalue* variable, const expression* value, LexerPosition position = lexer_null_value)
-            : super(position), variable(variable), value(value)
-        {
-        }
-
-        const lvalue* variable;
-        const expression* value;
+        type_expression       type;
+        std::list<expression> arguments;
     };
     
-    struct expression_incdec final : inherit_super<expression>
+    struct expression_new_array final
     {
-        expression_incdec(const lvalue* variable, const inc_dec_op* operatur, LexerPosition position = lexer_null_value)
-            : super(position), variable(variable), operatur(operatur)
-        {
-        }
-
-        const lvalue* variable;
-        const inc_dec_op* operatur;
+        type_expression              type;
+        expression                   context;
+        std::list<Maybe<expression>> arguments;
     };
     
-    struct expression_cast final : inherit_super<expression>
+    struct expression_lvalue final
     {
-        expression_cast(const type_expression* type, const expression* value, LexerPosition position = lexer_null_value)
-            : super(position), type(type), value(value)
-        {
-        }
-
-        const type_expression* type;
-        const expression* value;
+        lvalue variable;
     };
     
-    struct expression_ambiguous_cast final : inherit_super<expression>
+    struct expression_assignment final
     {
-        expression_ambiguous_cast(const expression* type, const expression* value, LexerPosition position = lexer_null_value)
-            : super(position), type(type), value(value)
-        {
-        }
-
-        const expression* type;
-        const expression* value;
+        lvalue     variable;
+        expression value;
+    };
+    
+    struct expression_incdec final
+    {
+        lvalue     variable;
+        inc_dec_op operatur;
+    };
+    
+    struct expression_cast final
+    {
+        type_expression type;
+        expression      value;
+    };
+    
+    struct expression_ambiguous_cast final
+    {
+        expression type;
+        expression value;
     };
 
-    struct expression_instance_of final : inherit_super<expression>
+    struct expression_instance_of final
     {
-        expression_instance_of(const expression* value, const type_expression* type, LexerPosition position = lexer_null_value)
-            : super(position), value(value), type(type)
-        {
-        }
-
-        const expression* value;
-        const type_expression* type;
+        expression      value;
+        type_expression type;
     };
 
-    struct expression_parentheses final : inherit_super<expression>
+    struct expression_parentheses final
     {
-        expression_parentheses(const expression* inside, LexerPosition position = lexer_null_value)
-            : super(position), inside(inside)
-        {
-        }
-
-        const expression* inside;
+        expression inside;
     };
 
     /* *************** Blocks and statements *************** */
     // Prototype
-    struct statement;
-
-    typedef std::list<const statement*> block;
-
-    struct statement
+    struct statement_expression final
     {
-        protected:
-            statement(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~statement() {}
-            LexerPosition position;
+        expression value;
     };
 
-    struct statement_expression final : inherit_super<statement>
+    struct statement_empty final
     {
-        statement_expression(const expression* value, LexerPosition position = lexer_null_value)
-            : super(position), value(value)
-        {
-        }
-
-        const expression* value;
     };
 
-    struct statement_if_then final : inherit_super<statement>
+    struct statement_void_return final
     {
-        statement_if_then(const expression* condition, const statement* true_statement, LexerPosition position = lexer_null_value)
-            : super(position), condition(condition), true_statement(true_statement)
-        {
-        }
-
-        const expression* condition;
-        const statement* true_statement;
     };
 
-    struct statement_if_then_else final : inherit_super<statement>
+    struct statement_value_return final
     {
-        statement_if_then_else(const expression* condition, const statement* true_statement, const statement* false_statement, LexerPosition position = lexer_null_value)
-            : super(position), condition(condition), true_statement(true_statement), false_statement(false_statement)
-        {
-        }
-
-        const expression* condition;
-        const statement* true_statement;
-        const statement* false_statement;
-    };
-    
-    struct statement_while final : inherit_super<statement>
-    {
-        statement_while(const expression* condition, const statement* loop_statement, LexerPosition position = lexer_null_value)
-            : super(position), condition(condition), loop_statement(loop_statement)
-        {
-        }
-
-        const expression* condition;
-        const statement* loop_statement;
+        expression value;
     };
 
-    struct statement_empty final : inherit_super<statement>
+    struct statement_local_declaration final
     {
-        statement_empty(LexerPosition position = lexer_null_value)
-            : super(position)
-        {
-        }
-    };
-
-    struct statement_block final : inherit_super<statement>
-    {
-        statement_block(block body, LexerPosition position = lexer_null_value)
-            : super(position), body(body)
-        {
-        }
-
-        block body;
-    };
-
-    struct statement_void_return final : inherit_super<statement>
-    {
-        statement_void_return(LexerPosition position = lexer_null_value)
-            : super(position)
-        {
-        }
-    };
-
-    struct statement_value_return final : inherit_super<statement>
-    {
-        statement_value_return(const expression* value, LexerPosition position = lexer_null_value)
-            : super(position), value(value)
-        {
-        }
-
-        const expression* value;
-    };
-
-    struct statement_local_declaration final : inherit_super<statement>
-    {
-        statement_local_declaration(const type_expression* type, identifier name, Maybe<const expression*> optional_initializer, LexerPosition position = lexer_null_value)
-            : super(position), type(type), name(name), optional_initializer(optional_initializer)
-        {
-        }
-
-        const type_expression* type;
+        type_expression type;
         identifier name;
-        Maybe<const expression*> optional_initializer;
+        Maybe<expression> optional_initializer;
     };
 
-    struct statement_throw final : inherit_super<statement>
+    struct statement_throw final
     {
-        statement_throw(const expression* throwee, LexerPosition position = lexer_null_value)
-            : super(position), throwee(throwee)
-        {
-        }
-
-        const expression* throwee;
+        expression throwee;
     };
     
-    struct statement_super_call final : inherit_super<statement>
+    struct statement_super_call final
     {
-        statement_super_call(std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), arguments(arguments)
-        {
-        }
-
-        std::list<const expression*> arguments;
+        std::list<expression> arguments;
     };
     
-    struct statement_this_call final : inherit_super<statement>
+    struct statement_this_call final
     {
-        statement_this_call(std::list<const expression*> arguments, LexerPosition position = lexer_null_value)
-            : super(position), arguments(arguments)
-        {
-        }
+        std::list<expression> arguments;
+    };
 
-        std::list<const expression*> arguments;
+    struct statement_if_then;
+    struct statement_if_then_else;
+    
+    struct statement_while;
+    struct statement_block;
+
+    using statement = boost::variant<
+        statement_expression,
+        statement_empty,
+        statement_void_return,
+        statement_value_return,
+        statement_local_declaration,
+        statement_throw,
+        statement_super_call,
+        statement_this_call,
+
+        boost::recursive_wrapper<statement_if_then>,
+        boost::recursive_wrapper<statement_if_then_else>,
+
+        boost::recursive_wrapper<statement_while>,
+        boost::recursive_wrapper<statement_block>
+    >;
+
+    typedef std::list<statement> block;
+
+    struct statement_if_then final
+    {
+        expression condition;
+        statement true_statement;
+    };
+
+    struct statement_if_then_else final
+    {
+        expression condition;
+        statement true_statement;
+        statement false_statement;
+    };
+    
+    struct statement_while final
+    {
+        expression condition;
+        statement loop_statement;
+    };
+
+    struct statement_block final
+    {
+        block body;
     };
 
     typedef block body;
@@ -605,220 +439,124 @@ namespace Ast
     /* *************** Package and imports **************** */
     typedef name package_declaration;
 
-    struct import_declaration
+    struct import_declaration_on_demand final
     {
-        protected:
-            import_declaration(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~import_declaration() {}
-            LexerPosition position;
+        name import;
     };
 
-    struct import_declaration_on_demand final : inherit_super<import_declaration>
+    struct import_declaration_single final
     {
-        import_declaration_on_demand(const name* import, LexerPosition position = lexer_null_value)
-            : super(position), import(import)
-        {
-        }
-
-        const name* import;
-    };
-
-    struct import_declaration_single final : inherit_super<import_declaration>
-    {
-        import_declaration_single(const name* import, identifier class_name, LexerPosition position = lexer_null_value)
-            : super(position), import(import), class_name(class_name)
-        {
-        }
-
-        const name* import;
+        //import_declaration_single() = default;
+        name import;
         identifier class_name;
     };
 
-    /* *************** Field and method declarations *************** */
-    struct access
-    {
-        protected:
-            access() {}
-        public:
-            virtual ~access() {}
-    };
-    struct access_public final : inherit_super<access> {};
-    struct access_protected final : inherit_super<access> {};
+    using import_declaration = boost::variant<import_declaration_on_demand, import_declaration_single>;
 
-    typedef std::pair<const expression*, identifier> formal_parameter;
+    /* *************** Field and method declarations *************** */
+    template <typename T>
+    struct access_specifier final {};
+
+    using access_public    = access_specifier<struct access_public_tag>;
+    using access_protected = access_specifier<struct access_protected_tag>;
+    using access           = boost::variant<access_public, access_protected>;
+
+    typedef std::pair<expression, identifier> formal_parameter;
 
     struct field_declaration
     {
-        field_declaration(const access* access_type, bool is_static, bool is_final, const type_expression* type, identifier name, Maybe<const expression*> optional_initializer)
-            : access_type(access_type), is_static(is_static), is_final(is_final), type(type), name(name), optional_initializer(optional_initializer)
-        {
-        }
-
-        const access* access_type;
+        access access_type;
         bool is_static;
         bool is_final;
-        const type_expression* type;
+        type_expression type;
         identifier name;
-        Maybe<const expression*> optional_initializer;
+        Maybe<expression> optional_initializer;
     };
 
     struct method_declaration
     {
-        method_declaration(const access* access_type, bool is_static, bool is_final, bool is_abstract, const type_expression* return_type, identifier name, std::list<formal_parameter> formal_parameters, std::list<const namedtype*> throws, Maybe<body> method_body)
-            : access_type(access_type), is_static(is_static), is_final(is_final), is_abstract(is_abstract), return_type(return_type), name(name), formal_parameters(formal_parameters), throws(throws), method_body(method_body)
-        {
-        }
-
-        const access* access_type;
+        access access_type;
         bool is_static;
         bool is_final;
         bool is_abstract;
-        const type_expression* return_type;
+        type_expression return_type;
         identifier name;
         std::list<formal_parameter> formal_parameters;
-        std::list<const namedtype*> throws;
+        std::list<namedtype> throws;
         Maybe<body> method_body;
     };
 
     struct constructor_declaration
     {
-        constructor_declaration(const access* access_type, identifier name, std::list<formal_parameter> formal_parameters, std::list<const namedtype*> throws, Maybe<body> method_body)
-            : access_type(access_type), name(name), formal_parameters(formal_parameters), throws(throws), method_body(method_body)
-        {
-        }
-
-        const access* access_type;
+        access access_type;
         identifier name;
         std::list<formal_parameter> formal_parameters;
-        std::list<const namedtype*> throws;
+        std::list<namedtype> throws;
         Maybe<body> method_body;
     };
 
-    struct declaration
+    struct declaration_field final
     {
-        protected:
-            declaration(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~declaration() {}
-            LexerPosition position;
-    };
-
-    struct declaration_field final : inherit_super<declaration>
-    {
-        declaration_field(field_declaration decl, LexerPosition position = lexer_null_value)
-            : super(position), decl(decl)
-        {
-        }
-
         field_declaration decl;
     };
 
-    struct declaration_method final : inherit_super<declaration>
+    struct declaration_method final
     {
-        declaration_method(method_declaration decl, LexerPosition position = lexer_null_value)
-            : super(position), decl(decl)
-        {
-        }
-
         method_declaration decl;
     };
 
-    struct declaration_constructor final : inherit_super<declaration>
+    struct declaration_constructor final
     {
-        declaration_constructor(constructor_declaration decl, LexerPosition position = lexer_null_value)
-            : super(position), decl(decl)
-        {
-        }
-
         constructor_declaration decl;
     };
+
+    using declaration = boost::variant<declaration_field, declaration_method, declaration_constructor>;
+
     /* *************** Type declarations **************** */
     struct class_declaration
     {
-        class_declaration(bool is_final, bool is_abstract, identifier name, const namedtype* extends, std::list<const namedtype*> implements, std::list<const declaration*> members)
-            : is_final(is_final), is_abstract(is_abstract), name(name), extends(extends), implements(implements), members(members)
-        {
-        }
-
         bool is_final;
         bool is_abstract;
         identifier name;
-        const namedtype* extends;
-        std::list<const namedtype*> implements;
-        std::list<const declaration*> members;
+        namedtype extends;
+        std::list<namedtype> implements;
+        std::list<declaration> members;
     };
 
     struct interface_declaration
     {
-        interface_declaration(identifier name, std::list<const namedtype*> extends, std::list<const declaration*> members)
-            : name(name), extends(extends), members(members)
-        {
-        }
-
         identifier name;
-        std::list<const namedtype*> extends;
-        std::list<const declaration*> members;
+        std::list<namedtype> extends;
+        std::list<declaration> members;
     };
 
-    struct type_declaration
-    {
-        protected:
-            type_declaration(LexerPosition position = lexer_null_value)
-                : position(position)
-            {
-            }
-        public:
-            virtual ~type_declaration() {}
-            LexerPosition position;
-    };
+    using type_declaration = boost::variant<class_declaration, interface_declaration>;
 
-    struct type_declaration_class final : inherit_super<type_declaration>
-    {
-        type_declaration_class(class_declaration type, LexerPosition position = lexer_null_value)
-            : super(position), type(type)
-        {
-        }
-
-        class_declaration type;
-    };
-
-    struct type_declaration_interface final : inherit_super<type_declaration>
-    {
-        type_declaration_interface(interface_declaration type, LexerPosition position = lexer_null_value)
-            : super(position), type(type)
-        {
-        }
-
-        interface_declaration type;
-    };
+    using type_declaration_class     = class_declaration;
+    using type_declaration_interface = interface_declaration;
 
     /* *************** Programs **************** */
     struct source_file
     {
-        // TODO: Get rid of this, or atleast make it private friend
-        source_file()
-        {
-        }
-
-        source_file(std::string name, Maybe<const package_declaration*> package, std::list<const import_declaration*> imports, const type_declaration* type)
-            : name(name), package(package), imports(imports), type(type)
-        {
-        }
-
         std::string name;
-        Maybe<const package_declaration*> package;
-        std::list<const import_declaration*> imports;
-        const type_declaration* type;
+        Maybe<package_declaration> package;
+        std::list<import_declaration> imports;
+        type_declaration type;
     };
 
     typedef std::list<source_file> program;
 }
+
+BOOST_FUSION_ADAPT_STRUCT(Ast::source_file, (std::string, name)(Maybe<Ast::package_declaration>, package)
+        (std::list<Ast::import_declaration>, imports)
+        (Ast::type_declaration, type))
+
+BOOST_FUSION_ADAPT_STRUCT(Ast::class_declaration, (bool, is_final)(bool, is_abstract)(Ast::identifier, name)
+        (Ast::namedtype, extends)(std::list<Ast::namedtype>, implements)(std::list<Ast::declaration>, members))
+
+BOOST_FUSION_ADAPT_STRUCT(Ast::interface_declaration, 
+        (Ast::identifier, name)
+        (std::list<Ast::namedtype>, extends)
+        (std::list<Ast::declaration>, members))
 
 #endif //_COMPILER_AST_HPP

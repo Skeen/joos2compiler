@@ -4,179 +4,97 @@
 #include "Boost_Spirit_Config.hpp"
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/phoenix/function/adapt_function.hpp>
 
 namespace phoenix = boost::phoenix;
-namespace qi  = boost::spirit::qi;
+namespace qi      = boost::spirit::qi;
 
 #include <string>
 
 #include <cassert>
 // Enable declarations in case clauses, which are disabled by default
 #define XTL_CLAUSE_DECL 1
-#include "typeswitch/match.hpp"
 
 #include "Tokens.hpp"
-#include "Ast.hpp"
-#include "Ast_helper.hpp"
+#include "ast.hpp"
+#include "ast_helper.hpp"
+
+namespace boost { namespace spirit { namespace traits {
+
+    template </*typename Exposed, typename Transformed, typename Domain, typename Enable*/>
+        struct transform_attribute<Ast::import_declaration_on_demand, Ast::name, qi::domain, void>
+        {
+            typedef Ast::name type;
+
+            static type pre (Ast::import_declaration_on_demand&)                 { return {}; }
+            static void post(Ast::import_declaration_on_demand& val, type attr)  { val = { attr }; }
+            static void fail(Ast::import_declaration_on_demand&)                 { }
+        }; 
+
+}}}
 
 namespace Parser
 {
-    Ast::source_file build_source_file(Maybe<const Ast::package_declaration*> package_decl, std::list<const Ast::import_declaration*> imports_decl, Ast::type_declaration* type_decl)
-    {
-        return Ast::source_file(std::string("test"), package_decl, imports_decl, type_decl);
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::source_file, build_source_file_, build_source_file, 3)
-
-    Maybe<const Ast::package_declaration*> build_optional_package(boost::optional<Ast::package_declaration*> package_decl)
-    {
-        if(package_decl)
-        {
-            return Maybe<const Ast::package_declaration*>(*package_decl);
-        }
-        else
-        {
-            return Maybe<const Ast::package_declaration*>();
-        }
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Maybe<const Ast::package_declaration*>, build_optional_package_, build_optional_package, 1)
-    
-    Ast::name* build_name(std::string str, std::vector<std::string> vec)
+    Ast::name build_name(const std::string& str, const std::vector<std::string>& vec)
     {
         if(vec.size() == 0)
         {
-            return (new Ast::name_simple(Ast::identifier(str)));
+            return Ast::name_simple { Ast::identifier{str} };
         }
         else
         {
-            std::list<Ast::identifier> qualified_name;
-            qualified_name.push_back(Ast::identifier(str));
-            for(std::string value : vec)
-            {
-                qualified_name.push_back(Ast::identifier(value));
-            }
-            return (new Ast::name_qualified(qualified_name));
+            std::list<Ast::identifier> qualified_name { begin(vec), end(vec) };
+            qualified_name.insert(begin(qualified_name), {str});
+            return Ast::name_qualified{ qualified_name };
         }
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::name*, build_name_, build_name, 2)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::name, build_name_, build_name, 2)
 
-    std::list<const Ast::import_declaration*> build_imports(std::vector<Ast::import_declaration*> vec)
-    {
-        return std::list<const Ast::import_declaration*>(vec.begin(), vec.end());
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<const Ast::import_declaration*>, build_imports_, build_imports, 1)
-
-    Ast::import_declaration* build_on_demand_import(Ast::name* name)
-    {
-        return (new Ast::import_declaration_on_demand(name));
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_on_demand_import_, build_on_demand_import, 1)
-
-    Ast::import_declaration* build_single_import(Ast::name* name, bool& pass)
+    Ast::import_declaration_single build_single_import(Ast::name const& name, bool& pass)
     {
         std::list<Ast::identifier> qualified_name = Ast::name_to_identifier_list(name);
         // A single import statement, has the form of id(.id)+, this means
         // atleast 2 identifiers, otherwise there's a syntax error.
-        if(qualified_name.size() < 2)
-        {
-            pass = false;
-            // TODO: Get rid of this assert false, really we should just trigger
-            // a parse error, using the pass = false statement.
-            assert(false);
-            return nullptr;
-        }
-        else
+        pass = qualified_name.size() > 1;
+        if (pass)
         {
             Ast::identifier class_name = qualified_name.back();
             qualified_name.pop_back();
 
-            return (new Ast::import_declaration_single(new Ast::name_qualified(qualified_name), class_name));
-        }
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration*, build_single_import_, build_single_import, 2)
-
-    Ast::type_declaration_class* build_class_declaration(bool is_final, bool is_abstract, std::string name, Ast::namedtype* extends, std::list<const Ast::namedtype*> implements, std::list<const Ast::declaration*> class_body)
-    {
-        Ast::class_declaration class_decl(is_final, is_abstract, Ast::identifier(name), extends, implements, class_body);
-        return (new Ast::type_declaration_class(class_decl));
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_declaration_class*, build_class_declaration_, build_class_declaration, 6)
-
-    Ast::type_declaration_interface* build_interface_declaration(std::string name, std::list<const Ast::namedtype*> extends, std::list<const Ast::declaration*> interface_body)
-    {
-        Ast::interface_declaration interface_decl(Ast::identifier(name), extends, interface_body);
-        return (new Ast::type_declaration_interface(interface_decl));
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_declaration_interface*, build_interface_declaration_, build_interface_declaration, 3)
-
-    Ast::namedtype* build_class_extends(boost::optional<Ast::namedtype*> extends_option)
-    {
-        if(extends_option)
+            return { Ast::name_qualified { qualified_name }, class_name };
+        } else
         {
-            return *extends_option;
-        }
-        else
-        {
-            std::list<Ast::identifier> qualified;
-            qualified.push_back(Ast::identifier("java"));
-            qualified.push_back(Ast::identifier("lang"));
-            qualified.push_back(Ast::identifier("Object"));
-            
-            return (new Ast::name_qualified(qualified));
+            return { Ast::name_qualified { { } }, { "" } };
         }
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::namedtype*, build_class_extends_, build_class_extends, 1)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::import_declaration_single, build_single_import_, build_single_import, 2)
 
-    std::list<const Ast::namedtype*> build_implements_decl(boost::optional<std::list<const Ast::namedtype*>> implements_list)
+    Ast::type_declaration_class build_class_declaration(bool is_final, bool is_abstract, const std::string& name, Ast::namedtype extends, std::list<Ast::namedtype> implements, std::list<Ast::declaration> class_body)
     {
-        if(implements_list)
-        {
-            return *implements_list;
-        }
-        else
-        {
-            return std::list<const Ast::namedtype*>();
-        }
+        return { is_final, is_abstract, Ast::identifier{name}, extends, implements, class_body };
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<const Ast::namedtype*>, build_implements_decl_, build_implements_decl, 1)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_declaration_class, build_class_declaration_, build_class_declaration, 6)
 
-    std::list<const Ast::namedtype*> build_typename_list(Ast::name* name, std::vector<Ast::name*> vec)
+    Ast::type_declaration_interface build_interface_declaration(std::string name, std::list<Ast::namedtype> extends, std::list<Ast::declaration> interface_body)
     {
-        std::list<const Ast::namedtype*> id_list;
-        id_list.push_back(name);
-        for(Ast::name* value : vec)
-        {
-            id_list.push_back(value);
-        }
-        return id_list;
+        return { Ast::identifier { name }, extends, interface_body };
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<const Ast::namedtype*>, build_typename_list_, build_typename_list, 2)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_declaration_interface, build_interface_declaration_, build_interface_declaration, 3)
 
-    std::list<const Ast::declaration*> declaration_vector_to_list(std::vector<Ast::declaration*> vec)
+    Ast::namedtype build_class_extends(boost::optional<Ast::namedtype> extends_option)
     {
-        return std::list<const Ast::declaration*>(vec.begin(), vec.end());
+        static const Ast::name_qualified default_ { { {"java"}, {"lang"}, {"Object"} } };
+        return extends_option? *extends_option : default_;
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(std::list<const Ast::declaration*>, declaration_vector_to_list_, declaration_vector_to_list, 1)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::namedtype, build_class_extends_, build_class_extends, 1)
 
-    Ast::type_expression_named* build_named_typeexp(Ast::name* name)
+    Ast::type_expression_tarray build_array_typeexp(Ast::type_expression typeexp, unsigned num_brackets)
     {
-        return (new Ast::type_expression_named(name));
+        Ast::type_expression_tarray value { typeexp }; // Create the inner-most array
+        return num_brackets <= 1? value : build_array_typeexp(value, num_brackets-1);
     }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_expression_named*, build_named_typeexp_, build_named_typeexp, 1)
-
-    Ast::type_expression_tarray* build_array_typeexp(Ast::type_expression* typeexp, std::vector<bool> num_brackets)
-    {
-        // Create the inner-most array
-        Ast::type_expression_tarray* value = new Ast::type_expression_tarray(typeexp);
-        // Start wrapping it, one time for each number of brackets
-        for(bool b : num_brackets)
-        {
-            value = new Ast::type_expression_tarray(value);
-        }
-        // Return the wrapped array
-        return value;
-    }
-    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_expression_tarray*, build_array_typeexp_, build_array_typeexp, 2)
+    BOOST_PHOENIX_ADAPT_FUNCTION(Ast::type_expression_tarray, build_array_typeexp_, build_array_typeexp, 2)
 
     ///////////////////////////////////////////////////////////////////////////////
     //  Grammar definition
@@ -188,43 +106,49 @@ namespace Parser
             java_grammar(TokenDef const& tok)
             : java_grammar::base_type(start)
             {
-                // TODO: Consider where we want the expectation '>' operator,
-                // rather that the sequence '>>' operator.
-                // TODO: Consider if some of the build_* functions should be
-                // replaced by phoenix::new_<type>(type_constructor_args);
-                // TODO: qi::eps matches \Lambda; Use this to throw meaningful
-                // syntax exceptions!
-                start = source_file [ qi::_val = qi::_1 ] > qi::eoi
+                start = source_file  > qi::eoi
                       ;
                 
-                source_file = (optional_package >> imports >> type)
-                                [ qi::_val = build_source_file_(qi::_1, qi::_2, qi::_3) ]
+                source_file = (qi::attr(std::string("test")) >> optional_package >> imports >> type)
                       ;
 
-                optional_package = (-package)
-                                [ qi::_val = build_optional_package_(qi::_1) ]
+                optional_package = -package
                       ;
                     
                 package = (qi::raw_token(PACKAGE) >> name >> qi::raw_token(SEMI_COLON))
-                                [ qi::_val = qi::_1 ]
                       ;
 
                 imports = (*import)
-                                [ qi::_val = build_imports_(qi::_1) ]
                       ;
 
-                import  = (qi::raw_token(IMPORT) >> name >> qi::raw_token(DOT) >> qi::raw_token(STAR) >> qi::raw_token(SEMI_COLON))
-                                [ qi::_val = build_on_demand_import_(qi::_1) ]
-                        | (qi::raw_token(IMPORT) >> name >> qi::raw_token(SEMI_COLON))
-                                [ qi::_val = build_single_import_(qi::_1, qi::_pass) ]
+                import_on_demand = 
+                    qi::raw_token(IMPORT) >> name >> qi::raw_token(DOT) >> qi::raw_token(STAR) >> qi::raw_token(SEMI_COLON)
+                    ;
+
+                import_single = 
+                    (qi::raw_token(IMPORT) >> name >> qi::raw_token(SEMI_COLON))
+                        [ qi::_val = build_single_import_(qi::_1, qi::_pass) ]
+                    ;
+
+                import  = import_on_demand
+                        | import_single
                         ;
 
-                type = (class_type)      [ qi::_val = qi::_1 ]
-                     | (interface_type)  [ qi::_val = qi::_1 ]
+                type = (class_type)      
+                     | (interface_type)  
                      ;
 
-                class_type = (qi::raw_token(PUBLIC) >> (-qi::token(FINAL)) >> (-qi::token(ABSTRACT)) >> qi::raw_token(CLASS) >> tok.identifier >> class_extends_decl >> implements_decl >> class_body)
-                        [ qi::_val = build_class_declaration_(qi::_1, qi::_2, qi::_3, qi::_4, qi::_5, qi::_6) ]
+                class_type = 
+                    (
+                        qi::raw_token(PUBLIC)                    >> 
+                        (qi::token(FINAL) ^ qi::token(ABSTRACT)) >> 
+                        qi::raw_token(CLASS)                     >> 
+                        tok.identifier                           >> 
+                        class_extends_decl                       >> 
+                        implements_decl                          >> 
+                        class_body
+                    )
+                        [ qi::_val = build_class_declaration_(phoenix::at_c<0>(qi::_1), phoenix::at_c<1>(qi::_1), qi::_2, qi::_3, qi::_4, qi::_5) ]
                     ;
 
                 interface_type = (qi::raw_token(PUBLIC) >> qi::raw_token(INTERFACE) >> tok.identifier >> interface_extends_decl >> interface_body)
@@ -232,11 +156,9 @@ namespace Parser
                     ;
 
                 class_body = (qi::raw_token(LEFT_BRACE) >> *member_decl >> qi::raw_token(RIGHT_BRACE))
-                        [ qi::_val = declaration_vector_to_list_(qi::_1) ]
                         ;
 
                 interface_body = (qi::raw_token(LEFT_BRACE) >> *interface_member_declaration >> qi::raw_token(RIGHT_BRACE))
-                        [ qi::_val = declaration_vector_to_list_(qi::_1) ]
                         ;
 
                 class_extends_decl = (-(qi::raw_token(EXTENDS) >> name))
@@ -244,104 +166,97 @@ namespace Parser
                         ;
 
                 implements_decl = (-(qi::raw_token(IMPLEMENTS) >> typename_list))
-                            [ qi::_val = build_implements_decl_(qi::_1) ]
                         ;
                 
                 interface_extends_decl = (-(qi::raw_token(EXTENDS) >> typename_list))
-                            [ qi::_val = build_implements_decl_(qi::_1) ]
                         ;
 
                 typename_list = (name >> *(qi::raw_token(COMMA) >> name))
-                            [ qi::_val = build_typename_list_(qi::_1, qi::_2) ]
                         ;
 
-                member_decl = method_declaration        [ qi::_val = qi::_1 ]
-                            | constructor_declaration   [ qi::_val = qi::_1 ]
-                            | field_declaration         [ qi::_val = qi::_1 ]
+                member_decl = method_declaration        
+                            | constructor_declaration   
+                            | field_declaration         
                             ;
 
-                interface_member_declaration = implicit_method_declaration [ qi::_val = qi::_1 ]
-                                             | member_decl [ qi::_val = qi::_1 ]
+                interface_member_declaration = implicit_method_declaration 
+                                             | member_decl 
                                              ;
 
-                typeexp = primitive_typeexp [ qi::_val = qi::_1 ]
-                        | reference_typeexp [ qi::_val = qi::_1 ]
+                typeexp = primitive_typeexp
+                        | reference_typeexp
                         ;
 
-                reference_typeexp = (qi::raw_token(VOID))
-                                      [ qi::_val = phoenix::new_<Ast::type_expression_base>(phoenix::new_<Ast::base_type_void>()) ]
-                                  | named_typeexp
-                                      [ qi::_val = qi::_1 ]
-                                  | array_typeexp
-                                      [ qi::_val = qi::_1 ]
-                                  ;
+                reference_typeexp = 
+                      qi::attr_cast<Ast::base_type_void> (qi::raw_token(VOID))
+                    | named_typeexp
+                    | array_typeexp
+                    ;
 
-                primitive_typeexp = (qi::raw_token(BOOLEAN))
-                                      [ qi::_val = phoenix::new_<Ast::type_expression_base>(phoenix::new_<Ast::base_type_boolean>()) ]
-                                  | (qi::raw_token(BYTE))
-                                      [ qi::_val = phoenix::new_<Ast::type_expression_base>(phoenix::new_<Ast::base_type_byte>()) ]
-                                  | (qi::raw_token(SHORT))
-                                      [ qi::_val = phoenix::new_<Ast::type_expression_base>(phoenix::new_<Ast::base_type_short>()) ]
-                                  | (qi::raw_token(CHAR))
-                                      [ qi::_val = phoenix::new_<Ast::type_expression_base>(phoenix::new_<Ast::base_type_char>()) ]
-                                  | (qi::raw_token(INT))
-                                      [ qi::_val = phoenix::new_<Ast::type_expression_base>(phoenix::new_<Ast::base_type_int>()) ]
-                                  ;
+                primitive_typeexp = 
+                      qi::attr_cast<Ast::base_type_boolean>(qi::raw_token(BOOLEAN))
+                    | qi::attr_cast<Ast::base_type_byte>(qi::raw_token(BYTE))
+                    | qi::attr_cast<Ast::base_type_short>(qi::raw_token(SHORT))
+                    | qi::attr_cast<Ast::base_type_char>(qi::raw_token(CHAR))
+                    | qi::attr_cast<Ast::base_type_int>(qi::raw_token(INT))
+                    ;
 
-                named_typeexp = name [ qi::_val = build_named_typeexp_(qi::_1) ];
+                named_typeexp = name; // [ qi::_val = build_named_typeexp(qi::_1) ];
 
-                empty_brackets = (qi::token(LEFT_BRACKET) >> qi::token(RIGHT_BRACKET))
-                                    [ qi::_val = true ]
-                               ;
+                empty_brackets = qi::token(LEFT_BRACKET) >> qi::token(RIGHT_BRACKET);
 
-                array_typeexp = (primitive_typeexp >> +(empty_brackets))
-                                  [ qi::_val = build_array_typeexp_(qi::_1, qi::_2) ]
-                              | (named_typeexp >> +(empty_brackets))
-                                  [ qi::_val = build_array_typeexp_(qi::_1, qi::_2) ]
-                              ;
+                n_empty_brackets = qi::eps [ qi::_val = 0 ] >> +empty_brackets [ ++qi::_val ];
+                element_type     = primitive_typeexp | named_typeexp;
+
+                array_typeexp = 
+                    (element_type >> n_empty_brackets)
+                    [ qi::_val = build_array_typeexp_(qi::_1, qi::_2) ]
+                    ;
                 
-                access = (qi::raw_token(PUBLIC))
-                            [ qi::_val = phoenix::new_<Ast::access_public>() ]
-                       | (qi::raw_token(PROTECTED))
-                            [ qi::_val = phoenix::new_<Ast::access_protected>() ]
+                access = qi::attr_cast<Ast::access_public>    (qi::raw_token(PUBLIC))
+                       | qi::attr_cast<Ast::access_protected> (qi::raw_token(PROTECTED))
                        ; 
 
-                name = (tok.identifier >> *(qi::raw_token(DOT) >> tok.identifier))
-                                [ qi::_val = build_name_(qi::_1, qi::_2) ]
-                    ;
+                name = 
+                    (tok.identifier >> *(qi::raw_token(DOT) >> tok.identifier))
+                    [ qi::_val = build_name_(qi::_1, qi::_2) ];
             }  
 
         qi::rule<Iterator, Ast::source_file()> start;
         qi::rule<Iterator, Ast::source_file()> source_file;
-        qi::rule<Iterator, Maybe<const Ast::package_declaration*>()> optional_package;
-        qi::rule<Iterator, Ast::package_declaration*()> package;
-        qi::rule<Iterator, std::list<const Ast::import_declaration*>()> imports;
-        qi::rule<Iterator, Ast::import_declaration*()> import;
-        qi::rule<Iterator, Ast::type_declaration*()> type;
-        qi::rule<Iterator, Ast::type_declaration_class*()> class_type;
-        qi::rule<Iterator, Ast::type_declaration_interface*()> interface_type;
-        qi::rule<Iterator, std::list<const Ast::declaration*>()> class_body;
-        qi::rule<Iterator, std::list<const Ast::declaration*>()> interface_body;
-        qi::rule<Iterator, Ast::namedtype*()> class_extends_decl;
-        qi::rule<Iterator, std::list<const Ast::namedtype*>()> implements_decl;
-        qi::rule<Iterator, std::list<const Ast::namedtype*>()> interface_extends_decl;
-        qi::rule<Iterator, std::list<const Ast::namedtype*>()> typename_list;
-        qi::rule<Iterator, Ast::declaration*()> member_decl;
-        qi::rule<Iterator, Ast::declaration*()> interface_member_declaration;
+        qi::rule<Iterator, Maybe<Ast::package_declaration>()> optional_package;
+        qi::rule<Iterator, Ast::package_declaration()> package;
+        qi::rule<Iterator, std::list<Ast::import_declaration>()> imports;
+        qi::rule<Iterator, Ast::import_declaration_on_demand()> import_on_demand;
+        qi::rule<Iterator, Ast::import_declaration_single()> import_single;
+        qi::rule<Iterator, Ast::import_declaration()> import;
+        qi::rule<Iterator, Ast::type_declaration()> type;
+        qi::rule<Iterator, Ast::type_declaration_class()> class_type;
+        qi::rule<Iterator, Ast::type_declaration_interface()> interface_type;
+        qi::rule<Iterator, std::list<Ast::declaration>()> class_body;
+        qi::rule<Iterator, std::list<Ast::declaration>()> interface_body;
+        qi::rule<Iterator, Ast::namedtype()> class_extends_decl;
+        qi::rule<Iterator, std::list<Ast::namedtype>()> implements_decl;
+        qi::rule<Iterator, std::list<Ast::namedtype>()> interface_extends_decl;
+        qi::rule<Iterator, std::list<Ast::namedtype>()> typename_list;
+        qi::rule<Iterator, Ast::declaration()> member_decl;
+        qi::rule<Iterator, Ast::declaration()> interface_member_declaration;
         // Missing declaration start
-        qi::rule<Iterator, Ast::declaration_method*()> implicit_method_declaration;
-        qi::rule<Iterator, Ast::declaration_method*()> method_declaration;
-        qi::rule<Iterator, Ast::declaration_constructor*()> constructor_declaration;
-        qi::rule<Iterator, Ast::declaration_field*()> field_declaration;
+        qi::rule<Iterator, Ast::declaration_method()> implicit_method_declaration;
+        qi::rule<Iterator, Ast::declaration_method()> method_declaration;
+        qi::rule<Iterator, Ast::declaration_constructor()> constructor_declaration;
+        qi::rule<Iterator, Ast::declaration_field()> field_declaration;
         // Missing declaration stop
-        qi::rule<Iterator, Ast::type_expression*()> typeexp;
-        qi::rule<Iterator, Ast::type_expression*()> reference_typeexp;
-        qi::rule<Iterator, Ast::type_expression_base*()> primitive_typeexp;
-        qi::rule<Iterator, Ast::type_expression_named*()> named_typeexp;
-        qi::rule<Iterator, Ast::type_expression_tarray*()> array_typeexp;
-        qi::rule<Iterator, bool()> empty_brackets;
-        qi::rule<Iterator, Ast::access*()> access;
-        qi::rule<Iterator, Ast::name*()> name;
+        qi::rule<Iterator, Ast::type_expression()> typeexp;
+        qi::rule<Iterator, Ast::type_expression()> reference_typeexp;
+        qi::rule<Iterator, Ast::type_expression_base()> primitive_typeexp;
+        qi::rule<Iterator, Ast::type_expression_named()> named_typeexp;
+        qi::rule<Iterator, unsigned()> n_empty_brackets;
+        qi::rule<Iterator, Ast::type_expression()> element_type;
+        qi::rule<Iterator, Ast::type_expression_tarray()> array_typeexp;
+        qi::rule<Iterator> empty_brackets;
+        qi::rule<Iterator, Ast::access()> access;
+        qi::rule<Iterator, Ast::name()> name;
     };
 
 

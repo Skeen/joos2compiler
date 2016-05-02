@@ -4,9 +4,9 @@
 #include "utility.hpp"
 
 #include "ast_generate.hpp"
-#include "error.hpp"
+#include "Error.hpp"
 
-#include "lexer_debug.hpp"
+#include "Lexer_debug.hpp"
 
 #include <iostream>
 #include <fstream>
