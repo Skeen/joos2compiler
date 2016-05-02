@@ -10,12 +10,15 @@ The compiler is loosely based of the OCaml compiler developed as a part of the d
 This project tries to implement a joos2 compiler, in C++11, using;
 
 1. boost::spirit, for lexing and parsing;
+
 * http://boost-spirit.com/
 
 2. Open Type Switching, for tree processing;
+
 * https://parasol.tamu.edu/~yuriys/pm/
 * http://www.stroustrup.com/OOPSLA-typeswitch-draft.pdf
 
 3. Option Type, rather than null;
+
 * https://github.com/simonask/simonask.github.com/blob/master/maybe.markdown
 * https://github.com/simonask/reflect/blob/master/base/maybe.hpp
